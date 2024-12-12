@@ -79,7 +79,7 @@ const AdminsScreen = () => {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>Admins</Text>
+        <Text style={styles.title}>Register New Admin</Text>
         <TouchableOpacity 
           style={styles.addButton} 
           onPress={() => setIsAddModalVisible(true)}
@@ -165,30 +165,35 @@ const AdminsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#f0f0f0', // Light gray background
+    padding: 15,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 15,
-    backgroundColor: 'white',
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    backgroundColor: '#ffffff', // White background
+    borderRadius: 15,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    marginBottom: 20,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#333', // Dark gray text
+    fontFamily: 'Arial', // Use a modern font if available
   },
   addButton: {
-    backgroundColor: '#007bff',
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    backgroundColor: '#007bff', // Blue button
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
@@ -198,37 +203,40 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   adminList: {
-    paddingHorizontal: 15,
+    paddingHorizontal: 10,
     paddingTop: 10,
   },
   adminCard: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 15,
+    backgroundColor: '#ffffff', // White background
+    borderRadius: 15,
+    padding: 20,
+    marginBottom: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    borderWidth: 1,
+    borderColor: '#e0e0e0', // Light gray border
   },
   adminCardText: {
-    fontSize: 16,
-    color: '#333',
-    marginBottom: 5,
+    fontSize: 18,
+    color: '#555', // Slightly lighter text
+    marginBottom: 10,
+    fontFamily: 'Arial', // Use a modern font if available
   },
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0,0,0,0.5)', // Semi-transparent background
   },
   modalContent: {
     width: '90%',
     maxHeight: '90%',
-    backgroundColor: 'white',
-    borderRadius: 15,
-    padding: 20,
+    backgroundColor: '#ffffff', // White background
+    borderRadius: 20,
+    padding: 25,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
@@ -240,39 +248,49 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   modalTitle: {
-    fontSize: 22,
+    fontSize: 26,
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
-    color: '#333',
+    color: '#333', // Dark gray text
+    fontFamily: 'Arial', // Use a modern font if available
   },
   input: {
     borderWidth: 1,
     borderColor: '#ddd',
     padding: 15,
-    marginBottom: 15,
+    marginBottom: 20,
     borderRadius: 10,
-    backgroundColor: '#f9f9f9',
-    color: '#333',
+    backgroundColor: '#f9f9f9', // Light gray background
+    color: '#333', // Dark gray text
+    fontSize: 16,
+    fontFamily: 'Arial', // Use a modern font if available
   },
   modalButtonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 15,
+    marginTop: 20,
   },
   modalButton: {
-    backgroundColor: '#007bff',
-    padding: 12,
+    backgroundColor: '#007bff', // Blue button
+    padding: 15,
     borderRadius: 10,
     width: '48%',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 3,
   },
   cancelButton: {
-    backgroundColor: '#6c757d',
+    backgroundColor: '#6c757d', // Gray button
   },
   modalButtonText: {
     color: 'white',
     fontWeight: 'bold',
+    fontSize: 16,
+    fontFamily: 'Arial', // Use a modern font if available
   },
 });
 
