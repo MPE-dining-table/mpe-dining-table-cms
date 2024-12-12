@@ -270,30 +270,35 @@ const RestaurantsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#f0f0f0', // Light gray background
+    padding: 15,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 15,
-    backgroundColor: 'white',
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    backgroundColor: '#ffffff', // White background
+    borderRadius: 15,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    marginBottom: 20,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#333', // Dark gray text
+    fontFamily: 'Arial', // Use a modern font if available
   },
   addButton: {
-    backgroundColor: '#007bff',
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    backgroundColor: '#007bff', // Blue button
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
@@ -310,8 +315,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   card: {
-    backgroundColor: 'white',
-    borderRadius: 10,
+    backgroundColor: '#ffffff', // White background
+    borderRadius: 15,
     width: '48%',
     marginBottom: 15,
     shadowColor: '#000',
@@ -319,50 +324,61 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    borderWidth: 1,
+    borderColor: '#e0e0e0', // Light gray border
   },
   cardImage: {
     width: '100%',
     height: 150,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15,
     resizeMode: 'cover',
   },
   cardContent: {
-    padding: 10,
+    padding: 15,
   },
   cardTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#333', // Dark gray text
+    fontFamily: 'Arial', // Use a modern font if available
   },
   cardSubtitle: {
-    color: '#666',
+    fontSize: 16,
+    color: '#666', // Slightly lighter text
     marginTop: 5,
+    fontFamily: 'Arial', // Use a modern font if available
   },
   cardAddress: {
-    color: '#888',
+    fontSize: 14,
+    color: '#888', // Even lighter text
     marginTop: 5,
+    fontFamily: 'Arial', // Use a modern font if available
   },
   cardAbout: {
-    color: '#444',
+    fontSize: 14,
+    color: '#444', // Dark gray text
     marginTop: 5,
+    fontFamily: 'Arial', // Use a modern font if available
   },
-  cardTimeSlot: { // Style for time slot
-    color: '#666',
+  cardTimeSlot: {
+    fontSize: 14,
+    color: '#666', // Slightly lighter text
     marginTop: 5,
+    fontFamily: 'Arial', // Use a modern font if available
   },
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0,0,0,0.5)', // Semi-transparent background
   },
   modalContent: {
     width: '90%',
     maxHeight: '90%',
-    backgroundColor: 'white',
-    borderRadius: 15,
-    padding: 20,
+    backgroundColor: '#ffffff', // White background
+    borderRadius: 20,
+    padding: 25,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
@@ -374,20 +390,23 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   modalTitle: {
-    fontSize: 22,
+    fontSize: 26,
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
-    color: '#333',
+    color: '#333', // Dark gray text
+    fontFamily: 'Arial', // Use a modern font if available
   },
   input: {
     borderWidth: 1,
     borderColor: '#ddd',
     padding: 15,
-    marginBottom: 15,
+    marginBottom: 20,
     borderRadius: 10,
-    backgroundColor: '#f9f9f9',
-    color: '#333',
+    backgroundColor: '#f9f9f9', // Light gray background
+    color: '#333', // Dark gray text
+    fontSize: 16,
+    fontFamily: 'Arial', // Use a modern font if available
   },
   multilineInput: {
     minHeight: 100,
@@ -397,17 +416,18 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   label: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 5,
-    color: '#333',
+    color: '#333', // Dark gray text
+    fontFamily: 'Arial', // Use a modern font if available
   },
   picker: {
     borderWidth: 1,
     borderColor: '#ddd',
     borderRadius: 10,
     marginBottom: 15,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#f9f9f9', // Light gray background
   },
   imageUploadContainer: {
     marginBottom: 15,
@@ -420,41 +440,57 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   imageUploadText: {
-    color: '#888',
+    fontSize: 16,
+    color: '#888', // Light gray text
     marginBottom: 10,
+    fontFamily: 'Arial', // Use a modern font if available
   },
   imageUploadButton: {
     flexDirection: 'row',
-    backgroundColor: '#28a745',
-    padding: 12,
+    backgroundColor: '#28a745', // Green button
+    padding: 15,
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 3,
   },
   imageUploadButtonText: {
     color: 'white',
-    marginLeft: 10,
     fontWeight: 'bold',
+    fontSize: 16,
+    fontFamily: 'Arial', // Use a modern font if available
   },
   modalButtonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 15,
+    marginTop: 20,
   },
   modalButton: {
-    backgroundColor: '#007bff',
-    padding: 12,
+    backgroundColor: '#007bff', // Blue button
+    padding: 15,
     borderRadius: 10,
     width: '48%',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 3,
   },
   cancelButton: {
-    backgroundColor: '#6c757d',
+    backgroundColor: '#6c757d', // Gray button
   },
   modalButtonText: {
     color: 'white',
     fontWeight: 'bold',
+    fontSize: 16,
+    fontFamily: 'Arial', // Use a modern font if available
   },
 });
+
 
 export default RestaurantsScreen;
