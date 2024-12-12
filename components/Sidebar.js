@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Image, TouchableOpacity, StyleSheet,Text} from 'react-native';
+import { View, Image, TouchableOpacity, StyleSheet, Text, hr } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 const Sidebar = () => {
@@ -64,6 +64,11 @@ const Sidebar = () => {
         onPress={() => handleNavigation('Settings')}>
         <Text style={styles.menuText}>⚙️ Settings</Text>
       </TouchableOpacity>
+
+      <View style={styles.horizontalBar} />
+
+      {/* Beta Version */}
+      <Text style={styles.betaVersion}>Beta Version 1.0</Text>
     </View>
   );
 };
@@ -97,7 +102,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 5,
     elevation: 3,
-
   },
   menuItemActive: {
     backgroundColor: '#ff6b6b',
@@ -106,6 +110,20 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#fff',
     fontWeight: '500',
+  },
+  horizontalBar: {
+    height: 1,
+    backgroundColor: '#444',
+    marginVertical: 15,
+    width: '100%',
+    top:"20%"
+  },
+  betaVersion: {
+    color: '#fff',
+    fontSize: 12,
+    textAlign: 'center',
+    marginBottom: 15,
+    top:"20%"
   },
 });
 

@@ -263,6 +263,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#3a3f47',
     borderLeftWidth: 5,
     borderLeftColor: 'grey',
+    
   },
   statsText: {
     fontSize: 16,
@@ -298,6 +299,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
+    
   },
   title: {
     fontSize: 18,
