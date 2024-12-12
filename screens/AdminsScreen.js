@@ -71,7 +71,7 @@ const AdminsScreen = () => {
       <Text style={styles.adminCardText}>Full Name: {item.fullName}</Text>
       <Text style={styles.adminCardText}>Email: {item.email}</Text>
       <Text style={styles.adminCardText}>Role: {item.role}</Text>
-      <Text style={styles.adminCardText}>Password: {item.password}</Text>
+      <Text style={styles.adminCardText}>Password: **********</Text> {/* Masked password */}
     </View>
   );
 
