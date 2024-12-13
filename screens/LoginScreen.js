@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Provider as PaperProvider, Appbar } from 'react-native-paper';
 
 const LoginScreen = () => {
   const navigation = useNavigation();
@@ -15,52 +14,116 @@ const LoginScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Login</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
-      <Button title="Login" onPress={handleLogin} />
-    </View>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.container}
+    >
+      <View style={styles.background}>
+        <View style={styles.leftBackground} />
+        <View style={styles.rightBackground} />
+      </View>
+      <View style={styles.content}>
+        <Text style={styles.header}>Welcome Back</Text>
+        <Text style={styles.subHeader}>Please sign in to your account</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          autoCapitalize="none"
+        />
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+          <Text style={styles.buttonText}>Login</Text>
+        </TouchableOpacity>
+        <Text style={styles.signupText}>
+          Don't have an account? <Text style={styles.signupLink}>Sign Up</Text>
+        </Text>
+      </View>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  background: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    flexDirection: 'row',
+  },
+  leftBackground: {
+    flex: 1,
+    backgroundColor: '#6A5ACD', // Left side color (e.g., Slate Blue)
+  },
+  rightBackground: {
+    flex: 1,
+    backgroundColor: '#FF6347', // Right side color (e.g., Tomato)
+  },
+  content: {
+    flex: 1,
     justifyContent: 'center',
-    padding: 16,
-    height:"100%"
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: 'transparent', // Ensures the content is transparent
   },
   header: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+    color: '#fff', // White text for contrast
+  },
+  subHeader: {
+    fontSize: 16,
+    color: '#f5f5f5', // Light gray text for contrast
     marginBottom: 20,
     textAlign: 'center',
   },
   input: {
+    width: '100%',
     height: 50,
-    borderColor: '#ccc',
+    borderColor: '#ddd',
     borderWidth: 1,
     borderRadius: 8,
     marginBottom: 15,
-    paddingLeft: 10,
+    paddingLeft: 15,
+    backgroundColor: '#fff', // White background for inputs
+    fontSize: 16,
+  },
+  button: {
+    width: '100%',
+    backgroundColor: '#007BFF',
+    borderRadius: 8,
+    paddingVertical: 15,
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   signupText: {
     textAlign: 'center',
-    marginTop: 10,
-    color: 'blue',
+    color: '#f5f5f5', // Light gray text for contrast
+    fontSize: 16,
+  },
+  signupLink: {
+    color: '#fff', // White text for contrast
+    fontWeight: 'bold',
   },
 });
 
