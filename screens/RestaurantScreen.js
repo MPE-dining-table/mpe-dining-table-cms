@@ -10,6 +10,9 @@ import {
   TextInput, 
   ScrollView,
   Platform,
+  KeyboardAvoidingView,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { Ionicons } from '@expo/vector-icons';
@@ -128,7 +131,7 @@ const RestaurantsScreen = () => {
         <Text style={styles.cardSubtitle}>{item.cuisine}</Text>
         <Text style={styles.cardAddress}>{item.address}</Text>
         <Text style={styles.cardAbout} numberOfLines={2}>{item.about}</Text>
-        <Text style={styles.cardTimeSlot}>{item.timeSlot}</Text> {/* Display time slot */}
+        <Text style={styles.cardTimeSlot}>{item.timeSlot}</Text>
       </View>
     </View>
   );
@@ -163,105 +166,112 @@ const RestaurantsScreen = () => {
         transparent={true}
         onRequestClose={() => setIsAddModalVisible(false)}
       >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Add New Restaurant</Text>
-            <ScrollView 
-              contentContainerStyle={styles.scrollViewContent}
-              keyboardShouldPersistTaps="handled"
-            >
-              <TextInput
-                style={styles.input}
-                placeholder="Restaurant Name"
-                placeholderTextColor="#888"
-                value={newRestaurant.name}
-                onChangeText={(text) => setNewRestaurant({...newRestaurant, name: text})}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Address"
-                placeholderTextColor="#888"
-                value={newRestaurant.address}
-                onChangeText={(text) => setNewRestaurant({...newRestaurant, address: text})}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Cuisine"
-                placeholderTextColor="#888"
-                value={newRestaurant.cuisine}
-                onChangeText={(text) => setNewRestaurant({...newRestaurant, cuisine: text})}
-              />
-              <TextInput
-                style={[styles.input, styles.multilineInput]}
-                placeholder="About"
-                placeholderTextColor="#888"
-                multiline
-                value={newRestaurant.about}
-                onChangeText={(text) => setNewRestaurant({...newRestaurant, about: text})}
-              />
-              
-              {/* Time Slot Section */}
-              <View style={styles.timeSlotContainer}>
-                <Text style={styles.label}>Opening Time</Text>
-                <Picker
-                  selectedValue={newRestaurant.openingTime}
-                  onValueChange={(itemValue) => setNewRestaurant({...newRestaurant, openingTime: itemValue})}
-                  style={styles.picker}
-                >
-                  {generateTimeOptions().map((time, index) => (
-                    <Picker.Item key={index} label={time} value={time} />
-                  ))}
-                </Picker>
+        <KeyboardAvoidingView 
+          style={styles.modalContainer}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
+        >
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Add New Restaurant</Text>
+              <ScrollView 
+                contentContainerStyle={styles.scrollViewContent}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
+              >
+                <TextInput
+                  style={styles.input}
+                  placeholder="Restaurant Name"
+                  placeholderTextColor="#888"
+                  value={newRestaurant.name}
+                  onChangeText={(text) => setNewRestaurant({...newRestaurant, name: text})}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Address"
+                  placeholderTextColor="#888"
+                  value={newRestaurant.address}
+                  onChangeText={(text) => setNewRestaurant({...newRestaurant, address: text})}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Cuisine"
+                  placeholderTextColor="#888"
+                  value={newRestaurant.cuisine}
+                  onChangeText={(text) => setNewRestaurant({...newRestaurant, cuisine: text})}
+                />
+                <TextInput
+                  style={[styles.input, styles.multilineInput]}
+                  placeholder="About"
+                  placeholderTextColor="#888"
+                  multiline
+                  value={newRestaurant.about}
+                  onChangeText={(text) => setNewRestaurant({...newRestaurant, about: text})}
+                />
+                
+                {/* Time Slot Section */}
+                <View style={styles.timeSlotContainer}>
+                  <Text style={styles.label}>Opening Time</Text>
+                  <Picker
+                    selectedValue={newRestaurant.openingTime}
+                    onValueChange={(itemValue) => setNewRestaurant({...newRestaurant, openingTime: itemValue})}
+                    style={styles.picker}
+                  >
+                    {generateTimeOptions().map((time, index) => (
+                      <Picker.Item key={index} label={time} value={time} />
+                    ))}
+                  </Picker>
 
-                <Text style={styles.label}>Closing Time</Text>
-                <Picker
-                  selectedValue={newRestaurant.closingTime}
-                  onValueChange={(itemValue) => setNewRestaurant({...newRestaurant, closingTime: itemValue})}
-                  style={styles.picker}
-                >
-                  {generateTimeOptions().map((time, index) => (
-                    <Picker.Item key={index} label={time} value={time} />
-                  ))}
-                </Picker>
-              </View>
+                  <Text style={styles.label}>Closing Time</Text>
+                  <Picker
+                    selectedValue={newRestaurant.closingTime}
+                    onValueChange={(itemValue) => setNewRestaurant({...newRestaurant, closingTime: itemValue})}
+                    style={styles.picker}
+                  >
+                    {generateTimeOptions().map((time, index) => (
+                      <Picker.Item key={index} label={time} value={time} />
+                    ))}
+                  </Picker>
+                </View>
 
-              {/* Image Upload Section */}
-              <View style={styles.imageUploadContainer}>
-                {newRestaurant.image ? (
-                  <Image 
-                    source={{ uri: newRestaurant.image }} 
-                    style={styles.uploadedImage} 
-                  />
-                ) : (
-                  <Text style={styles.imageUploadText}>No image selected</Text>
-                )}
-                <TouchableOpacity 
-                  style={styles.imageUploadButton} 
-                  onPress={pickImage}
-                >
-                  <Ionicons name="image" size={24} color="white" />
-                  <Text style={styles.imageUploadButtonText}>Choose Image</Text>
-                </TouchableOpacity>
-              </View>
+                {/* Image Upload Section */}
+                <View style={styles.imageUploadContainer}>
+                  {newRestaurant.image ? (
+                    <Image 
+                      source={{ uri: newRestaurant.image }} 
+                      style={styles.uploadedImage} 
+                    />
+                  ) : (
+                    <Text style={styles.imageUploadText}>No image selected</Text>
+                  )}
+                  <TouchableOpacity 
+                    style={styles.imageUploadButton} 
+                    onPress={pickImage}
+                  >
+                    <Ionicons name="image" size={24} color="white" />
+                    <Text style={styles.imageUploadButtonText}>Choose Image</Text>
+                  </TouchableOpacity>
+                </View>
 
-              {/* Modal Buttons */}
-              <View style={styles.modalButtonContainer}>
-                <TouchableOpacity 
-                  style={styles.modalButton} 
-                  onPress={addRestaurant}
-                >
-                  <Text style={styles.modalButtonText}>Add Restaurant</Text>
-                </TouchableOpacity>
-                <TouchableOpacity 
-                  style={[styles.modalButton, styles.cancelButton]} 
-                  onPress={() => setIsAddModalVisible(false)}
-                >
-                  <Text style={styles.modalButtonText}>Cancel</Text>
-                </TouchableOpacity>
-              </View>
-            </ScrollView>
-          </View>
-        </View>
+                {/* Modal Buttons */}
+                <View style={styles.modalButtonContainer}>
+                  <TouchableOpacity 
+                    style={styles.modalButton} 
+                    onPress={addRestaurant}
+                  >
+                    <Text style={styles.modalButtonText}>Add Restaurant</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                    style={[styles.modalButton, styles.cancelButton]} 
+                    onPress={() => setIsAddModalVisible(false)}
+                  >
+                    <Text style={styles.modalButtonText}>Cancel</Text>
+                  </TouchableOpacity>
+                </View>
+              </ScrollView>
+            </View>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
       </Modal>
     </View>
   );
@@ -347,7 +357,7 @@ const styles = StyleSheet.create({
     color: '#444',
     marginTop: 5,
   },
-  cardTimeSlot: { // Style for time slot
+  cardTimeSlot: {
     color: '#666',
     marginTop: 5,
   },
@@ -388,6 +398,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: '#f9f9f9',
     color: '#333',
+    fontSize: 16,
   },
   multilineInput: {
     minHeight: 100,
@@ -408,6 +419,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 15,
     backgroundColor: '#f9f9f9',
+    padding: 10,
+    width: '100%', // Ensure the Picker takes the full width
   },
   imageUploadContainer: {
     marginBottom: 15,
@@ -418,6 +431,8 @@ const styles = StyleSheet.create({
     height: 200,
     borderRadius: 10,
     marginBottom: 15,
+    borderWidth: 1,
+    borderColor: '#ddd',
   },
   imageUploadText: {
     color: '#888',

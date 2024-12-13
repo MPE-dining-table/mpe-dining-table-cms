@@ -30,7 +30,7 @@ const Sidebar = () => {
       </TouchableOpacity>
 
       <TouchableOpacity
-        style={[styles.menuItem, activeRoute === 'Users' && styles.menuItemActive]}
+        style={[styles.menuItem, activeRoute === 'UsersScreen' && styles.menuItemActive]}
         onPress={() => handleNavigation('Users')}>
         <Text style={styles.menuText}>👥 Users</Text>
       </TouchableOpacity>
