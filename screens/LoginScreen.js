@@ -43,7 +43,7 @@ const LoginScreen = () => {
     if (validate()) {
       try {
         const response = await axios.post(
-          "https://mpe-backend-server.onrender.com/api/auth/admin-login",
+          "http://localhost:4000/api/auth/admin-login",
           userInfo
         );
 

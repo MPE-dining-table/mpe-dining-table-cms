@@ -13,7 +13,6 @@ import AdminsScreen from "./screens/AdminsScreen";
 import ReviewsScreen from "./screens/ReviewsScreen";
 import SettingsScreen from "./screens/SettingsScreen";
 import LoginScreen from "./screens/LoginScreen";
-// import SignupScreen from './screens/SignupScreen';
 
 const Drawer = createDrawerNavigator();
 
@@ -21,9 +20,20 @@ export default function App() {
   const [role, setRole] = useState(null);
 
   useEffect(() => {
-    setRole(AsyncStorage.getItem("admin"));
-    console.log(role)
+    const fetchRole = async () => {
+      try {
+        const storedData = await AsyncStorage.getItem("admin");
+        if (storedData) {
+          const parsedData = JSON.parse(storedData);
+          setRole(parsedData.user.role);
+        }
+      } catch (error) {
+        console.error("Error fetching role from AsyncStorage:", error);
+      }
+    };
+    fetchRole();
   }, []);
+
   return (
     <PaperProvider>
       <NavigationContainer>
@@ -31,28 +41,35 @@ export default function App() {
           drawerContent={(props) => <Sidebar {...props} />}
           initialRouteName="Login"
           screenOptions={({ route }) => ({
-            // Hide the drawer on the Login screen
             drawerStyle:
               route.name === "Login" ? { display: "none" } : undefined,
-            // Hide the hamburger menu (headerLeft) on Login screen
             headerLeft: route.name === "Login" ? null : undefined,
-            // Hide the drawer toggle button for the Login screen
             drawerType: route.name === "Login" ? "permanent" : undefined,
-            // Hide the header for the Login screen
             headerShown: route.name !== "Login",
-            // Make the Login screen full screen
             contentStyle: route.name === "Login" ? { flex: 1 } : undefined,
           })}
         >
+          {/* Both super-admin and admin can see these screens */}
           <Drawer.Screen name="Login" component={LoginScreen} />
-          {/* <Drawer.Screen name="Signup" component={SignupScreen} /> */}
           <Drawer.Screen name="Dashboard" component={DashboardScreen} />
-          <Drawer.Screen name="Users" component={UsersScreen} />
-          <Drawer.Screen name="Bookings" component={BookingsScreen} />
-          <Drawer.Screen name="Restaurants" component={RestaurantsScreen} />
-          <Drawer.Screen name="Admins" component={AdminsScreen} />
-          <Drawer.Screen name="Reviews" component={ReviewsScreen} />
           <Drawer.Screen name="Settings" component={SettingsScreen} />
+
+          {/* Only super-admin can see */}
+          {role === "super-admin" && (
+            <>
+              <Drawer.Screen name="Users" component={UsersScreen} />
+              <Drawer.Screen name="Restaurants" component={RestaurantsScreen} />
+              <Drawer.Screen name="Admins" component={AdminsScreen} />
+            </>
+          )}
+
+          {/* Only admin can see */}
+          {role === "admin" && (
+            <>
+              <Drawer.Screen name="Bookings" component={BookingsScreen} />
+              <Drawer.Screen name="Reviews" component={ReviewsScreen} />
+            </>
+          )}
         </Drawer.Navigator>
       </NavigationContainer>
     </PaperProvider>

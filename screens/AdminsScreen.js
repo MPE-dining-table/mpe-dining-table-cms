@@ -27,11 +27,10 @@ const AdminsScreen = () => {
   const [admins, setAdmins] = useState([]);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [newAdmin, setNewAdmin] = useState({
-    id: '',
     restaurantName: '',
     fullName: '',
     email: '',
-    role: '',
+    role: 'admin',
     password: '' // Auto-generated password
   });
 
@@ -55,11 +54,10 @@ const AdminsScreen = () => {
     setIsAddModalVisible(false);
     // Reset the new admin form
     setNewAdmin({
-      id: '',
       restaurantName: '',
       fullName: '',
       email: '',
-      role: '',
+      role: 'admin',
       password: ''
     });
   };
@@ -133,10 +131,9 @@ const AdminsScreen = () => {
               />
               <TextInput
                 style={styles.input}
-                placeholder="Role"
+                placeholder="Password"
                 placeholderTextColor="#888"
-                value={newAdmin.role}
-                onChangeText={(text) => setNewAdmin({...newAdmin, role: text})}
+                value={adminToAdd.password}
               />
 
               {/* Modal Buttons */}
