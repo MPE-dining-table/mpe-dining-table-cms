@@ -1,23 +1,29 @@
-import React from 'react';
-import { createDrawerNavigator } from '@react-navigation/drawer';
-import { NavigationContainer } from '@react-navigation/native';
-import { Provider as PaperProvider } from 'react-native-paper';
-
+import { useEffect, useState } from "react";
+import { createDrawerNavigator } from "@react-navigation/drawer";
+import { NavigationContainer } from "@react-navigation/native";
+import { Provider as PaperProvider } from "react-native-paper";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 // Import Screens
-import Sidebar from './components/Sidebar';
-import DashboardScreen from './screens/DashboardScreen';
-import UsersScreen from './screens/UsersScreen';
-import BookingsScreen from './screens/BookingsScreen';
-import RestaurantsScreen from './screens/RestaurantScreen';
-import AdminsScreen from './screens/AdminsScreen';
-import ReviewsScreen from './screens/ReviewsScreen';
-import SettingsScreen from './screens/SettingsScreen';
-import LoginScreen from './screens/LoginScreen';
+import Sidebar from "./components/Sidebar";
+import DashboardScreen from "./screens/DashboardScreen";
+import UsersScreen from "./screens/UsersScreen";
+import BookingsScreen from "./screens/BookingsScreen";
+import RestaurantsScreen from "./screens/RestaurantScreen";
+import AdminsScreen from "./screens/AdminsScreen";
+import ReviewsScreen from "./screens/ReviewsScreen";
+import SettingsScreen from "./screens/SettingsScreen";
+import LoginScreen from "./screens/LoginScreen";
 // import SignupScreen from './screens/SignupScreen';
 
 const Drawer = createDrawerNavigator();
 
 export default function App() {
+  const [role, setRole] = useState(null);
+
+  useEffect(() => {
+    setRole(AsyncStorage.getItem("admin"));
+    console.log(role)
+  }, []);
   return (
     <PaperProvider>
       <NavigationContainer>
@@ -26,15 +32,16 @@ export default function App() {
           initialRouteName="Login"
           screenOptions={({ route }) => ({
             // Hide the drawer on the Login screen
-            drawerStyle: route.name === 'Login' ? { display: 'none' } : undefined,
+            drawerStyle:
+              route.name === "Login" ? { display: "none" } : undefined,
             // Hide the hamburger menu (headerLeft) on Login screen
-            headerLeft: route.name === 'Login' ? null : undefined,
+            headerLeft: route.name === "Login" ? null : undefined,
             // Hide the drawer toggle button for the Login screen
-            drawerType: route.name === 'Login' ? 'permanent' : undefined,
+            drawerType: route.name === "Login" ? "permanent" : undefined,
             // Hide the header for the Login screen
-            headerShown: route.name !== 'Login',
+            headerShown: route.name !== "Login",
             // Make the Login screen full screen
-            contentStyle: route.name === 'Login' ? { flex: 1 } : undefined,
+            contentStyle: route.name === "Login" ? { flex: 1 } : undefined,
           })}
         >
           <Drawer.Screen name="Login" component={LoginScreen} />
