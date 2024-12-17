@@ -61,7 +61,7 @@ const AdminsScreen = () => {
       }
 
       const response = await axios.get(
-        "http://localhost:4000/api/actions/get-admins",
+        "https://mpe-backend-server.onrender.com/api/actions/get-admins",
         {
           headers: { Authorization: `Bearer ${token}` },
           params: { page: 1, limit: 10 }, // Fetch first 10 admins
@@ -89,7 +89,7 @@ const AdminsScreen = () => {
       }
 
       const response = await axios.post(
-        "http://localhost:4000/api/actions/add-new-admin",
+        "https://mpe-backend-server.onrender.com/api/actions/add-new-admin",
         {
           adminName: adminToAdd.fullName,
           email: adminToAdd.email,

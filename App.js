@@ -57,8 +57,8 @@ export default function App() {
           {/* Only super-admin can see */}
           {role === "super-admin" && (
             <>
-              <Drawer.Screen name="Users" component={UsersScreen} />
               <Drawer.Screen name="Restaurants" component={RestaurantsScreen} />
+              <Drawer.Screen name="Users" component={UsersScreen} />
               <Drawer.Screen name="Admins" component={AdminsScreen} />
             </>
           )}

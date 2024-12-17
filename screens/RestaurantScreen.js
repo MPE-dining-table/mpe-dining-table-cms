@@ -86,7 +86,7 @@ const RestaurantsScreen = () => {
       times.push(`${hour % 12 === 0 ? 12 : hour % 12}:00 ${hour < 12 ? 'AM' : 'PM'}`);
 
       // Add half-hour (e.g., 6:30 AM, 7:30 AM)
-      times.push(`${hour % 12 === 0 ? 12 : hour % 12}:30 ${hour < 12 ? 'AM' : 'PM'}`);
+      // times.push(`${hour % 12 === 0 ? 12 : hour % 12}:30 ${hour < 12 ? 'AM' : 'PM'}`);
     }
 
     return times;
