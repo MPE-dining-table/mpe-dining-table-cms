@@ -18,6 +18,7 @@ const Drawer = createDrawerNavigator();
 
 export default function App() {
   const [role, setRole] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchRole = async () => {
@@ -25,14 +26,25 @@ export default function App() {
         const storedData = await AsyncStorage.getItem("admin");
         if (storedData) {
           const parsedData = JSON.parse(storedData);
-          setRole(parsedData.user.role);
+          if (parsedData?.user?.role) {
+            setRole(parsedData.user.role);
+          } else {
+            console.warn("Invalid data structure in AsyncStorage");
+          }
         }
       } catch (error) {
         console.error("Error fetching role from AsyncStorage:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchRole();
   }, []);
+
+  if (isLoading) {
+    // Add a loading indicator here if necessary
+    return null; // Or replace with a loading spinner
+  }
 
   return (
     <PaperProvider>
@@ -41,20 +53,16 @@ export default function App() {
           drawerContent={(props) => <Sidebar {...props} />}
           initialRouteName="Login"
           screenOptions={({ route }) => ({
-            drawerStyle:
-              route.name === "Login" ? { display: "none" } : undefined,
-            headerLeft: route.name === "Login" ? null : undefined,
-            drawerType: route.name === "Login" ? "permanent" : undefined,
+            drawerStyle: route.name === "Login" ? { display: "none" } : undefined,
             headerShown: route.name !== "Login",
-            contentStyle: route.name === "Login" ? { flex: 1 } : undefined,
           })}
         >
-          {/* Both super-admin and admin can see these screens */}
+          {/* Common Screens for All Roles */}
           <Drawer.Screen name="Login" component={LoginScreen} />
           <Drawer.Screen name="Dashboard" component={DashboardScreen} />
           <Drawer.Screen name="Settings" component={SettingsScreen} />
 
-          {/* Only super-admin can see */}
+          {/* Role-Specific Screens */}
           {role === "super-admin" && (
             <>
               <Drawer.Screen name="Restaurants" component={RestaurantsScreen} />
@@ -63,7 +71,6 @@ export default function App() {
             </>
           )}
 
-          {/* Only admin can see */}
           {role === "admin" && (
             <>
               <Drawer.Screen name="Bookings" component={BookingsScreen} />
