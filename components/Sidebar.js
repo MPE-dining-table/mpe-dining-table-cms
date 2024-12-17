@@ -1,11 +1,28 @@
-import React, { useState } from 'react';
-import { View, Image, TouchableOpacity, StyleSheet, Text, hr } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Image, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import logo from '../assets/Mpelogo.png';
 
 const Sidebar = () => {
   const navigation = useNavigation();
   const [activeRoute, setActiveRoute] = useState('Dashboard'); // Track active route
+  const [role, setRole] = useState(null);
+
+  useEffect(() => {
+    const fetchRole = async () => {
+      try {
+        const storedData = await AsyncStorage.getItem('admin');
+        if (storedData) {
+          const parsedData = JSON.parse(storedData);
+          setRole(parsedData?.user?.role || null);
+        }
+      } catch (error) {
+        console.error('Error fetching role from AsyncStorage:', error);
+      }
+    };
+    fetchRole();
+  }, []);
 
   const handleNavigation = (route) => {
     setActiveRoute(route); // Update active route
@@ -23,43 +40,52 @@ const Sidebar = () => {
         />
       </View>
 
-      {/* Menu Items */}
+      {/* Common Menu Items */}
       <TouchableOpacity
         style={[styles.menuItem, activeRoute === 'Dashboard' && styles.menuItemActive]}
         onPress={() => handleNavigation('Dashboard')}>
         <Text style={styles.menuText}>📊 Dashboard</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style={[styles.menuItem, activeRoute === 'UsersScreen' && styles.menuItemActive]}
-        onPress={() => handleNavigation('Users')}>
-        <Text style={styles.menuText}>👥 Users</Text>
-      </TouchableOpacity>
+      {role === 'super-admin' && (
+        <>
+          <TouchableOpacity
+            style={[styles.menuItem, activeRoute === 'UsersScreen' && styles.menuItemActive]}
+            onPress={() => handleNavigation('Users')}>
+            <Text style={styles.menuText}>👥 Users</Text>
+          </TouchableOpacity>
 
-      <TouchableOpacity
-        style={[styles.menuItem, activeRoute === 'Bookings' && styles.menuItemActive]}
-        onPress={() => handleNavigation('Bookings')}>
-        <Text style={styles.menuText}>📅 Bookings</Text>
-      </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.menuItem, activeRoute === 'Restaurants' && styles.menuItemActive]}
+            onPress={() => handleNavigation('Restaurants')}>
+            <Text style={styles.menuText}>🍴 Restaurants</Text>
+          </TouchableOpacity>
 
-      <TouchableOpacity
-        style={[styles.menuItem, activeRoute === 'Restaurants' && styles.menuItemActive]}
-        onPress={() => handleNavigation('Restaurants')}>
-        <Text style={styles.menuText}>🍴 Restaurants</Text>
-      </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.menuItem, activeRoute === 'Admins' && styles.menuItemActive]}
+            onPress={() => handleNavigation('Admins')}>
+            <Text style={styles.menuText}>🛠 Admins</Text>
+          </TouchableOpacity>
+        </>
+      )}
 
-      <TouchableOpacity
-        style={[styles.menuItem, activeRoute === 'Admins' && styles.menuItemActive]}
-        onPress={() => handleNavigation('Admins')}>
-        <Text style={styles.menuText}>🛠 Admins</Text>
-      </TouchableOpacity>
+      {role === 'admin' && (
+        <>
+          <TouchableOpacity
+            style={[styles.menuItem, activeRoute === 'Bookings' && styles.menuItemActive]}
+            onPress={() => handleNavigation('Bookings')}>
+            <Text style={styles.menuText}>📅 Bookings</Text>
+          </TouchableOpacity>
 
-      <TouchableOpacity
-        style={[styles.menuItem, activeRoute === 'Reviews' && styles.menuItemActive]}
-        onPress={() => handleNavigation('Reviews')}>
-        <Text style={styles.menuText}>⭐ Reviews</Text>
-      </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.menuItem, activeRoute === 'Reviews' && styles.menuItemActive]}
+            onPress={() => handleNavigation('Reviews')}>
+            <Text style={styles.menuText}>⭐ Reviews</Text>
+          </TouchableOpacity>
+        </>
+      )}
 
+      {/* Common Menu Items */}
       <TouchableOpacity
         style={[styles.menuItem, activeRoute === 'Settings' && styles.menuItemActive]}
         onPress={() => handleNavigation('Settings')}>
@@ -81,13 +107,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#282c34',
     borderRightWidth: 1,
     borderRightColor: '#444',
-    width:'100%'
+    width: '100%',
   },
   logoContainer: {
     alignItems: 'center',
     marginBottom: 30,
-    right:'36%',
-    top:10,
+    right: '36%',
+    top: 10,
   },
   logo: {
     width: 100, // Adjust based on your logo size
@@ -117,14 +143,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#444',
     marginVertical: 15,
     width: '100%',
-    top:"20%"
+    top: '20%',
   },
   betaVersion: {
     color: '#fff',
     fontSize: 12,
     textAlign: 'center',
     marginBottom: 15,
-    top:"20%"
+    top: '20%',
   },
 });
 
