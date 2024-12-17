@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
+import { Text, ActivityIndicator, View, StyleSheet } from "react-native";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { NavigationContainer } from "@react-navigation/native";
 import { Provider as PaperProvider } from "react-native-paper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-// Import Screens
 import Sidebar from "./components/Sidebar";
 import DashboardScreen from "./screens/DashboardScreen";
 import UsersScreen from "./screens/UsersScreen";
@@ -26,11 +26,7 @@ export default function App() {
         const storedData = await AsyncStorage.getItem("admin");
         if (storedData) {
           const parsedData = JSON.parse(storedData);
-          if (parsedData?.user?.role) {
-            setRole(parsedData.user.role);
-          } else {
-            console.warn("Invalid data structure in AsyncStorage");
-          }
+          setRole(parsedData?.user?.role || null);
         }
       } catch (error) {
         console.error("Error fetching role from AsyncStorage:", error);
@@ -42,8 +38,12 @@ export default function App() {
   }, []);
 
   if (isLoading) {
-    // Add a loading indicator here if necessary
-    return null; // Or replace with a loading spinner
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#ff6b6b" />
+        <Text>Loading...</Text>
+      </View>
+    );
   }
 
   return (
@@ -57,12 +57,10 @@ export default function App() {
             headerShown: route.name !== "Login",
           })}
         >
-          {/* Common Screens for All Roles */}
           <Drawer.Screen name="Login" component={LoginScreen} />
           <Drawer.Screen name="Dashboard" component={DashboardScreen} />
           <Drawer.Screen name="Settings" component={SettingsScreen} />
-
-          {/* Role-Specific Screens */}
+          <Drawer.Screen name="Reviews" component={ReviewsScreen} />
           {role === "super-admin" && (
             <>
               <Drawer.Screen name="Restaurants" component={RestaurantsScreen} />
@@ -70,11 +68,11 @@ export default function App() {
               <Drawer.Screen name="Admins" component={AdminsScreen} />
             </>
           )}
-
           {role === "admin" && (
             <>
+              <Drawer.Screen name="Users" component={UsersScreen} />
               <Drawer.Screen name="Bookings" component={BookingsScreen} />
-              <Drawer.Screen name="Reviews" component={ReviewsScreen} />
+              <Drawer.Screen name="Restaurants" component={RestaurantsScreen} />
             </>
           )}
         </Drawer.Navigator>
@@ -82,3 +80,12 @@ export default function App() {
     </PaperProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
+  },
+});
