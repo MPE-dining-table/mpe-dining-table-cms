@@ -114,9 +114,9 @@ const LoginScreen = () => {
         <TouchableOpacity style={styles.button} onPress={handleSubmit}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
-        <Text style={styles.signupText}>
+        {/* <Text style={styles.signupText}>
           Don't have an account? <Text style={styles.signupLink}>Sign Up</Text>
-        </Text>
+        </Text> */}
       </View>
     </Fragment>
     // {/* </KeyboardAvoidingView> */}

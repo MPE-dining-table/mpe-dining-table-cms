@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Image, TouchableOpacity, StyleSheet, Text, hr } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import logo from '../assets/Mpelogo.png';
 
 const Sidebar = () => {
   const navigation = useNavigation();
@@ -16,7 +17,7 @@ const Sidebar = () => {
       {/* App Logo */}
       <View style={styles.logoContainer}>
         <Image
-          source={require('../../mpe-dining-table-cms/assets/Mpelogo.png')} // Replace with your logo path
+          source={logo} // Replace with your logo path
           style={styles.logo}
           resizeMode="contain"
         />
