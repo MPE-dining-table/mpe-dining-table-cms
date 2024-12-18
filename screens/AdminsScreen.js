@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     borderRadius: 10,
     backgroundColor: "#f9f9f9", // Light gray background
-    color: "#333", // Dark gray text
+    color: "black", // Dark gray text
     fontSize: 16,
     fontFamily: "Arial", // Use a modern font if available
   },

@@ -15,7 +15,7 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 
-const SuperAdminViewRestaurent = () => {
+const SuperAdminViewRestaurant = () => {
   const [restaurants, setRestaurants] = useState([
     {
       id: '1',
@@ -24,7 +24,7 @@ const SuperAdminViewRestaurent = () => {
       cuisine: 'Italian',
       about: 'Authentic Italian cuisine with a modern twist',
       image: 'https://example.com/pasta-restaurant.jpg',
-      timeSlot: '10:00 AM - 10:00 PM' // Example time slot
+      timeSlot: '10:00 AM - 10:00 PM'
     },
     {
       id: '2',
@@ -33,7 +33,7 @@ const SuperAdminViewRestaurent = () => {
       cuisine: 'Japanese',
       about: 'Fresh sushi and traditional Japanese dishes',
       image: 'https://example.com/sushi-restaurant.jpg',
-      timeSlot: '11:00 AM - 9:00 PM' // Example time slot
+      timeSlot: '11:00 AM - 9:00 PM'
     }
   ]);
 
@@ -92,13 +92,14 @@ const SuperAdminViewRestaurent = () => {
         data={restaurants}
         renderItem={({ item }) => <RestaurantCard item={item} />}
         keyExtractor={(item) => item.id}
+        contentContainerStyle={styles.flatListContent}
       />
 
       <TouchableOpacity
         style={styles.addButton}
         onPress={() => setModalVisible(true)}
       >
-        <Text style={styles.addButtonText}>Add New Restaurant</Text>
+        <Text style={styles.addButtonText}>+</Text>
       </TouchableOpacity>
 
       {/* Modal for adding new restaurant */}
@@ -113,6 +114,12 @@ const SuperAdminViewRestaurent = () => {
         >
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <ScrollView contentContainerStyle={styles.modalContent}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>Add New Restaurant</Text>
+                <TouchableOpacity onPress={() => setModalVisible(false)}>
+                
+                </TouchableOpacity>
+              </View>
               <TextInput 
                 style={styles.input} 
                 placeholder="Restaurant Name"
@@ -169,107 +176,169 @@ const SuperAdminViewRestaurent = () => {
   );
 };
 
-export default SuperAdminViewRestaurent;
+export default SuperAdminViewRestaurant;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    backgroundColor: "#f9f9f9", // Light gray background
+    padding: 15,
+    width:"100%"
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#333", // Dark gray text
     marginBottom: 20,
-    textAlign: 'center',
+    textAlign: "center",
+  },
+  flatListContent: {
+    paddingBottom: 20,
   },
   card: {
-    flexDirection: 'row',
+    flexDirection: "row",
+    backgroundColor: "#ffffff", // White background
+    borderRadius: 15,
     marginBottom: 20,
-    borderRadius: 8,
-    overflow: 'hidden',
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
     borderWidth: 1,
-    borderColor: '#ccc',
-    backgroundColor: '#fff',
+    borderColor: "#e0e0e0", // Light gray border
   },
   cardImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 8,
+    width: 120,
+    height: 120,
+    borderTopLeftRadius: 15,
+    borderBottomLeftRadius: 15,
   },
   cardContent: {
-    padding: 10,
     flex: 1,
+    padding: 15,
   },
   cardTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#333",
   },
   cardSubtitle: {
-    fontSize: 14,
-    color: '#888',
+    fontSize: 16,
+    color: "#888",
+    marginTop: 4,
   },
   cardAddress: {
-    fontSize: 14,
-    marginVertical: 5,
+    fontSize: 16,
+    color: "#555",
+    marginTop: 8,
   },
   cardAbout: {
     fontSize: 14,
-    color: '#555',
+    color: "#777",
+    marginTop: 8,
   },
   cardTimeSlot: {
     fontSize: 14,
-    color: '#777',
-    marginTop: 5,
+    color: "#777",
+    marginTop: 8,
   },
   addButton: {
-    backgroundColor: '#4CAF50',
-    paddingVertical: 12,
-    marginVertical: 20,
-    borderRadius: 8,
-    alignItems: 'center',
+    backgroundColor: "#007bff", // Blue button
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    position: "absolute",
+    bottom: 20,
+    right: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 3,
   },
   addButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    color: "white",
+    fontSize: 24,
+    fontWeight: "bold",
   },
   modalContainer: {
     flex: 1,
-    justifyContent: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)", // Semi-transparent background
   },
   modalContent: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 8,
-    marginHorizontal: 20,
+    top:'10%',
+    width: "100%",
+    maxHeight: "90%",
+    backgroundColor: "#ffffff", // White background
+    borderRadius: 20,
+    padding: 25,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  modalTitle: {
+    fontSize: 26,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  closeButton: {
+    
   },
   input: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-    marginBottom: 15,
-    paddingVertical: 8,
-    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    padding: 15,
+    marginBottom: 20,
+    borderRadius: 10,
+    backgroundColor: "#f9f9f9", // Light gray background
+    color: "#333",
     fontSize: 16,
   },
   submitButton: {
-    backgroundColor: '#4CAF50',
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
+    backgroundColor: "#007bff", // Blue button
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+    marginTop: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 3,
   },
   submitButtonText: {
-    color: '#fff',
+    color: "white",
+    fontWeight: "bold",
     fontSize: 16,
-    fontWeight: 'bold',
   },
   cancelButton: {
+    backgroundColor: "#6c757d", // Gray button
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
     marginTop: 10,
-    paddingVertical: 12,
-    alignItems: 'center',
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 3,
   },
   cancelButtonText: {
+    color: "white",
+    fontWeight: "bold",
     fontSize: 16,
-    color: '#f44336',
   },
 });

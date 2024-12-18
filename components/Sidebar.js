@@ -46,14 +46,14 @@ const Sidebar = () => {
         onPress={() => handleNavigation('Dashboard')}>
         <Text style={styles.menuText}>📊 Dashboard</Text>
       </TouchableOpacity>
-
-      {role === 'super-admin' && (
-        <>
-          <TouchableOpacity
+      <TouchableOpacity
             style={[styles.menuItem, activeRoute === 'UsersScreen' && styles.menuItemActive]}
             onPress={() => handleNavigation('Users')}>
             <Text style={styles.menuText}>👥 Users</Text>
           </TouchableOpacity>
+
+      {role === 'super-admin' && (
+        <>
 
           <TouchableOpacity
             style={[styles.menuItem, activeRoute === 'Restaurants' && styles.menuItemActive]}
