@@ -11,8 +11,10 @@ const RestaurantScreen = () => {
   useEffect(() => {
     const fetchRole = async () => {
       try {
+        // Fetch the stored data from AsyncStorage
         const storedData = await AsyncStorage.getItem("admin");
         if (storedData) {
+          // Parse the data and set the role
           const parsedData = JSON.parse(storedData);
           setRole(parsedData.user.role);
         }
@@ -25,6 +27,7 @@ const RestaurantScreen = () => {
     fetchRole();
   }, []);
 
+  // Show a loading spinner until the role is fetched
   if (loading) {
     return (
       <View style={styles.loaderContainer}>
@@ -33,6 +36,7 @@ const RestaurantScreen = () => {
     );
   }
 
+  // Render based on role or show error for invalid roles
   return (
     <View style={styles.container}>
       {role === "admin" ? (
@@ -53,6 +57,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    padding: 20,
   },
   loaderContainer: {
     flex: 1,
@@ -62,5 +67,6 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: 18,
     color: "red",
+    textAlign: "center",
   },
 });
