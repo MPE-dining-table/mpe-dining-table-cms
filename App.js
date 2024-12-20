@@ -13,6 +13,7 @@ import AdminsScreen from "./screens/AdminsScreen";
 import ReviewsScreen from "./screens/ReviewsScreen";
 import SettingsScreen from "./screens/SettingsScreen";
 import LoginScreen from "./screens/LoginScreen";
+import AdminRestaurantsScreen from "./screens/AdminRestaurentScreen";
 
 const Drawer = createDrawerNavigator();
 
@@ -53,7 +54,8 @@ export default function App() {
           drawerContent={(props) => <Sidebar {...props} />}
           initialRouteName="Login"
           screenOptions={({ route }) => ({
-            drawerStyle: route.name === "Login" ? { display: "none" } : undefined,
+            drawerStyle:
+              route.name === "Login" ? { display: "none" } : undefined,
             headerShown: route.name !== "Login",
           })}
         >
@@ -70,10 +72,12 @@ export default function App() {
           )}
           {role === "admin" && (
             <>
-              <Drawer.Screen name="Users" component={UsersScreen} />
+              <Drawer.Screen
+                name="AdminRestaurantsScreen"
+                component={AdminRestaurantsScreen}
+              />
               <Drawer.Screen name="Bookings" component={BookingsScreen} />
               <Drawer.Screen name="Restaurants" component={RestaurantsScreen} />
-              
             </>
           )}
         </Drawer.Navigator>

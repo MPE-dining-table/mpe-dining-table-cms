@@ -5,42 +5,42 @@ import {
   StyleSheet,
   TouchableOpacity,
   Modal,
-  TextInput,
   ScrollView,
-  Platform,
-  KeyboardAvoidingView,
-  Keyboard,
-  TouchableWithoutFeedback,
-  FlatList,
   Image,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Picker } from "@react-native-picker/picker";
+import { useNavigation } from "@react-navigation/native";
 
 const AdminRestaurantsScreen = () => {
   const [restaurants, setRestaurants] = useState([]);
-  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [role, setRole] = useState("admin");
+  const [selectedRestaurant, setSelectedRestaurant] = useState(null);
+  const navigation = useNavigation();
 
-  const [newRestaurant, setNewRestaurant] = useState({
-    name: "",
-    address: "",
-    cuisine: "",
-    about: "",
-    image: "",
-    openingTime: "06:00 AM",
-    closingTime: "10:00 PM",
-  });
+  const fetchToken = async () => {
+    try {
+      const adminData = await AsyncStorage.getItem("admin");
+      if (adminData) {
+        const parsedData = JSON.parse(adminData);
+        return parsedData.token;
+      }
+    } catch (error) {
+      console.error("Error fetching token:", error);
+      return null;
+    }
+  };
 
   useEffect(() => {
-    // Fetch restaurants
     const fetchRestaurants = async () => {
+      const token = await fetchToken();
       try {
         const response = await axios.get(
-          "https://mpe-backend-server.onrender.com/api/actions//fetch-restuarents"
+          "https://mpe-backend-server.onrender.com/api/actions/fetch-restuarent",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
         );
         setRestaurants(response.data);
       } catch (error) {
@@ -51,7 +51,6 @@ const AdminRestaurantsScreen = () => {
 
     fetchRestaurants();
 
-    // Fetch role (simulated)
     const fetchRole = async () => {
       try {
         const userData = await AsyncStorage.getItem("user");
@@ -67,53 +66,78 @@ const AdminRestaurantsScreen = () => {
     fetchRole();
   }, []);
 
+  const handleRestaurantSelect = (restaurant) => {
+    setSelectedRestaurant(restaurant);
+  };
+
+  if (selectedRestaurant) {
+    return (
+      <View style={styles.fullScreenContainer}>
+        <Image
+          source={{ uri: selectedRestaurant.image }}
+          style={styles.fullScreenImage}
+        />
+        <ScrollView style={styles.detailsContainer}>
+          <Text style={styles.detailsTitle}>{selectedRestaurant.restuarentName}</Text>
+          <Text style={styles.detailsText}>
+            Address: {selectedRestaurant.address}
+          </Text>
+          <Text style={styles.detailsText}>
+            Cuisine: {selectedRestaurant.cuisine.join(", ")}
+          </Text>
+          <Text style={styles.detailsText}>{selectedRestaurant.about}</Text>
+          <Text style={styles.detailsText}>
+            Opening Hours: {selectedRestaurant.openingTime} -{" "}
+            {selectedRestaurant.closingTime}
+          </Text>
+        </ScrollView>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => setSelectedRestaurant(null)}
+        >
+          <Ionicons name="arrow-back" size={24} color="white" />
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.title}>Restaurants</Text>
-        {role === "super-admin" ? (
-          <TouchableOpacity
-            style={styles.addButton}
-            onPress={() => setIsAddModalVisible(true)}
-          >
+        {role === "super-admin" && (
+          <TouchableOpacity style={styles.addButton}>
             <Ionicons name="add" size={24} color="white" />
             <Text style={styles.buttonText}>Add Restaurant</Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity style={styles.viewButton}>
-            <Text style={styles.buttonText}>View Your Restaurant</Text>
           </TouchableOpacity>
         )}
       </View>
 
-      {/* Restaurant List */}
-      <FlatList
-        data={restaurants}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.restaurantCard}>
-            <Image source={{ uri: item.image }} style={styles.restaurantImage} />
+      {/* Restaurant Cards */}
+      <ScrollView contentContainerStyle={styles.restaurantList}>
+        {restaurants.map((restaurant) => (
+          <TouchableOpacity
+            key={restaurant._id}
+            style={styles.restaurantCard}
+            onPress={() => handleRestaurantSelect(restaurant)}
+          >
+            <Image
+              source={{ uri: restaurant.image }}
+              style={styles.restaurantImage}
+            />
             <View style={styles.restaurantInfo}>
-              <Text style={styles.restaurantName}>{item.name}</Text>
-              <Text style={styles.restaurantAddress}>{item.address}</Text>
-              <Text style={styles.restaurantCuisine}>{item.cuisine}</Text>
+              <Text style={styles.restaurantName}>
+                {restaurant.restuarentName}
+              </Text>
+              <Text style={styles.restaurantAddress}>{restaurant.address}</Text>
+              <Text style={styles.restaurantCuisine}>
+                {restaurant.cuisine.join(", ")}
+              </Text>
             </View>
-          </View>
-        )}
-        contentContainerStyle={styles.restaurantList}
-      />
-
-      {/* Add Restaurant Modal */}
-      <Modal
-        visible={isAddModalVisible}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setIsAddModalVisible(false)}
-      >
-        {/* Modal Content */}
-        {/* Similar modal implementation from your original code */}
-      </Modal>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
     </View>
   );
 };
@@ -143,12 +167,6 @@ const styles = StyleSheet.create({
   addButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#007bff",
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    borderRadius: 25,
-  },
-  viewButton: {
     backgroundColor: "#007bff",
     paddingHorizontal: 15,
     paddingVertical: 10,
@@ -194,6 +212,34 @@ const styles = StyleSheet.create({
   restaurantCuisine: {
     fontSize: 14,
     color: "#666",
+  },
+  fullScreenContainer: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  fullScreenImage: {
+    width: "100%",
+    height: 250,
+  },
+  detailsContainer: {
+    padding: 15,
+  },
+  detailsTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  detailsText: {
+    fontSize: 16,
+    marginBottom: 5,
+  },
+  backButton: {
+    position: "absolute",
+    top: 30,
+    left: 15,
+    backgroundColor: "#007bff",
+    padding: 10,
+    borderRadius: 25,
   },
 });
 
