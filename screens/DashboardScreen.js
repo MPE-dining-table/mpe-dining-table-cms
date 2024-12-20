@@ -1,10 +1,11 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { BarChart, ProgressChart } from 'react-native-chart-kit';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const DashboardScreen = () => {
-  // Simulating user role (replace with real logic for checking the role)
-  const isSuperAdmin = true; // Change this to dynamically check user roles
+  const [role, setRole] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   // Users data
   const totalUsers = 500;
@@ -15,6 +16,23 @@ const DashboardScreen = () => {
   const totalBookings = 45;
   const paidBookings = 30;
   const pendingBookings = 15;
+
+  useEffect(() => {
+    const fetchRole = async () => {
+      try {
+        const storedData = await AsyncStorage.getItem("admin");
+        if (storedData) {
+          const parsedData = JSON.parse(storedData);
+          setRole(parsedData.user.role);
+        }
+      } catch (error) {
+        console.error("Error fetching role from AsyncStorage:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchRole();
+  }, []);
 
   // Users progress chart data
   const usersProgressChartData = {
@@ -40,136 +58,139 @@ const DashboardScreen = () => {
     datasets: [{ data: [paidBookings, pendingBookings, totalBookings] }],
   };
 
-  return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {/* Users Container */}
-      <View style={styles.sectionContainer}>
-        <Text style={styles.sectionTitle}>Users Overview</Text>
+  const UsersOverviewSection = () => (
+    <View style={styles.sectionContainer}>
+      <Text style={styles.sectionTitle}>Users Overview</Text>
 
-        {/* Users Stats */}
-        <View style={styles.statsContainer}>
-          <View style={[styles.statsBox, styles.activeBox]}>
-            <Text style={styles.statsText}>Active Users</Text>
-            <Text style={styles.statsValue}>{activeUsers}</Text>
-          </View>
-          <View style={[styles.statsBox, styles.inactiveBox]}>
-            <Text style={styles.statsText}>Inactive Users</Text>
-            <Text style={styles.statsValue}>{inactiveUsers}</Text>
-          </View>
+      <View style={styles.statsContainer}>
+        <View style={[styles.statsBox, styles.activeBox]}>
+          <Text style={styles.statsText}>Active Users</Text>
+          <Text style={styles.statsValue}>{activeUsers}</Text>
         </View>
-
-        {/* Users Progress Chart */}
-        <View style={styles.chartContainer}>
-          <Text style={styles.chartTitle}>User Status Distribution</Text>
-          <ProgressChart
-            data={usersProgressChartData}
-            width={300}
-            height={220}
-            strokeWidth={16}
-            radius={32}
-            chartConfig={{
-              backgroundColor: '#ffffff',
-              backgroundGradientFrom: '#ffffff',
-              backgroundGradientTo: '#ffffff',
-              decimalPlaces: 2,
-              color: (opacity = 1) => `rgba(33, 150, 243, ${opacity})`, // Blue for users
-              labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-            }}
-            hideLegend={false}
-          />
-        </View>
-
-        {/* Users Bar Chart */}
-        <View style={styles.chartContainer}>
-          <Text style={styles.chartTitle}>User Breakdown</Text>
-          <BarChart
-            data={usersBarChartData}
-            width={300}
-            height={220}
-            chartConfig={{
-              backgroundColor: '#ffffff',
-              backgroundGradientFrom: '#ffffff',
-              backgroundGradientTo: '#ffffff',
-              decimalPlaces: 0,
-              color: (opacity = 1) => `rgba(33, 150, 243, ${opacity})`, // Blue color
-              labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-              style: {
-                borderRadius: 16,
-              },
-              propsForLabels: {
-                fontSize: 12,
-                fontWeight: 'bold',
-              },
-            }}
-            fromZero
-          />
+        <View style={[styles.statsBox, styles.inactiveBox]}>
+          <Text style={styles.statsText}>Inactive Users</Text>
+          <Text style={styles.statsValue}>{inactiveUsers}</Text>
         </View>
       </View>
 
-      {/* Bookings Container */}
-      {!isSuperAdmin && (
-        <View style={styles.sectionContainer}>
-          <Text style={styles.sectionTitle}>Bookings Overview</Text>
+      <View style={styles.chartContainer}>
+        <Text style={styles.chartTitle}>User Status Distribution</Text>
+        <ProgressChart
+          data={usersProgressChartData}
+          width={300}
+          height={220}
+          strokeWidth={16}
+          radius={32}
+          chartConfig={{
+            backgroundColor: '#ffffff',
+            backgroundGradientFrom: '#ffffff',
+            backgroundGradientTo: '#ffffff',
+            decimalPlaces: 2,
+            color: (opacity = 1) => `rgba(33, 150, 243, ${opacity})`,
+            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+          }}
+          hideLegend={false}
+        />
+      </View>
 
-          {/* Bookings Stats */}
-          <View style={styles.statsContainer}>
-            <View style={[styles.statsBox, styles.paidBox]}>
-              <Text style={styles.statsText}>Paid Bookings</Text>
-              <Text style={styles.statsValue}>{paidBookings}</Text>
-            </View>
-            <View style={[styles.statsBox, styles.pendingBox]}>
-              <Text style={styles.statsText}>Pending Bookings</Text>
-              <Text style={styles.statsValue}>{pendingBookings}</Text>
-            </View>
-          </View>
+      <View style={styles.chartContainer}>
+        <Text style={styles.chartTitle}>User Breakdown</Text>
+        <BarChart
+          data={usersBarChartData}
+          width={300}
+          height={220}
+          chartConfig={{
+            backgroundColor: '#ffffff',
+            backgroundGradientFrom: '#ffffff',
+            backgroundGradientTo: '#ffffff',
+            decimalPlaces: 0,
+            color: (opacity = 1) => `rgba(33, 150, 243, ${opacity})`,
+            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+            style: { borderRadius: 16 },
+            propsForLabels: { fontSize: 12, fontWeight: 'bold' },
+          }}
+          fromZero
+        />
+      </View>
+    </View>
+  );
 
-          {/* Bookings Progress Chart */}
-          <View style={styles.chartContainer}>
-            <Text style={styles.chartTitle}>Booking Status Distribution</Text>
-            <ProgressChart
-              data={bookingsProgressChartData}
-              width={300}
-              height={220}
-              strokeWidth={16}
-              radius={32}
-              chartConfig={{
-                backgroundColor: '#ffffff',
-                backgroundGradientFrom: '#ffffff',
-                backgroundGradientTo: '#ffffff',
-                decimalPlaces: 2,
-                color: (opacity = 1) => `rgba(76, 175, 80, ${opacity})`, // Green for bookings
-                labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-              }}
-              hideLegend={false}
-            />
-          </View>
+  const BookingsOverviewSection = () => (
+    <View style={styles.sectionContainer}>
+      <Text style={styles.sectionTitle}>Bookings Overview</Text>
 
-          {/* Bookings Bar Chart */}
-          <View style={styles.chartContainer}>
-            <Text style={styles.chartTitle}>Booking Breakdown</Text>
-            <BarChart
-              data={bookingsBarChartData}
-              width={300}
-              height={220}
-              chartConfig={{
-                backgroundColor: '#ffffff',
-                backgroundGradientFrom: '#ffffff',
-                backgroundGradientTo: '#ffffff',
-                decimalPlaces: 0,
-                color: (opacity = 1) => `rgba(76, 175, 80, ${opacity})`, // Green color
-                labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                style: {
-                  borderRadius: 16,
-                },
-                propsForLabels: {
-                  fontSize: 12,
-                  fontWeight: 'bold',
-                },
-              }}
-              fromZero
-            />
-          </View>
+      <View style={styles.statsContainer}>
+        <View style={[styles.statsBox, styles.paidBox]}>
+          <Text style={styles.statsText}>Paid Bookings</Text>
+          <Text style={styles.statsValue}>{paidBookings}</Text>
         </View>
+        <View style={[styles.statsBox, styles.pendingBox]}>
+          <Text style={styles.statsText}>Pending Bookings</Text>
+          <Text style={styles.statsValue}>{pendingBookings}</Text>
+        </View>
+      </View>
+
+      <View style={styles.chartContainer}>
+        <Text style={styles.chartTitle}>Booking Status Distribution</Text>
+        <ProgressChart
+          data={bookingsProgressChartData}
+          width={300}
+          height={220}
+          strokeWidth={16}
+          radius={32}
+          chartConfig={{
+            backgroundColor: '#ffffff',
+            backgroundGradientFrom: '#ffffff',
+            backgroundGradientTo: '#ffffff',
+            decimalPlaces: 2,
+            color: (opacity = 1) => `rgba(76, 175, 80, ${opacity})`,
+            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+          }}
+          hideLegend={false}
+        />
+      </View>
+
+      <View style={styles.chartContainer}>
+        <Text style={styles.chartTitle}>Booking Breakdown</Text>
+        <BarChart
+          data={bookingsBarChartData}
+          width={300}
+          height={220}
+          chartConfig={{
+            backgroundColor: '#ffffff',
+            backgroundGradientFrom: '#ffffff',
+            backgroundGradientTo: '#ffffff',
+            decimalPlaces: 0,
+            color: (opacity = 1) => `rgba(76, 175, 80, ${opacity})`,
+            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+            style: { borderRadius: 16 },
+            propsForLabels: { fontSize: 12, fontWeight: 'bold' },
+          }}
+          fromZero
+        />
+      </View>
+    </View>
+  );
+
+  if (loading) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+
+  return (
+    <ScrollView contentContainerStyle={styles.container}>
+      {role === 'super-admin' ? (
+        <UsersOverviewSection />
+      ) : role === 'admin' ? (
+        <>
+          <UsersOverviewSection />
+          <BookingsOverviewSection />
+        </>
+      ) : (
+        <Text style={styles.errorText}>Invalid role or no access</Text>
       )}
     </ScrollView>
   );
@@ -180,6 +201,16 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     padding: 20,
     backgroundColor: '#f5f5f5',
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  errorText: {
+    fontSize: 18,
+    color: "red",
+    textAlign: "center",
   },
   sectionContainer: {
     marginBottom: 30,
@@ -203,16 +234,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   activeBox: {
-    backgroundColor: '#e3f2fd', // Light blue
+    backgroundColor: '#e3f2fd',
   },
   inactiveBox: {
-    backgroundColor: '#ffebee', // Light red
+    backgroundColor: '#ffebee',
   },
   paidBox: {
-    backgroundColor: '#e8f5e9', // Light green
+    backgroundColor: '#e8f5e9',
   },
   pendingBox: {
-    backgroundColor: '#fff3e0', // Light orange
+    backgroundColor: '#fff3e0',
   },
   statsText: {
     fontSize: 14,
