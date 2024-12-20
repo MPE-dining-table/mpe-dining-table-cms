@@ -75,6 +75,7 @@ export default function App() {
               <Drawer.Screen name="Users" component={UsersScreen} />
               <Drawer.Screen name="Bookings" component={BookingsScreen} />
               <Drawer.Screen name="Restaurants" component={RestaurantsScreen} />
+              
             </>
           )}
         </Drawer.Navigator>

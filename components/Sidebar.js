@@ -78,15 +78,16 @@ const Sidebar = () => {
             <Text style={styles.menuText}>📅 Bookings</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[styles.menuItem, activeRoute === 'Reviews' && styles.menuItemActive]}
-            onPress={() => handleNavigation('Reviews')}>
-            <Text style={styles.menuText}>⭐ Reviews</Text>
-          </TouchableOpacity>
+          
         </>
       )}
 
       {/* Common Menu Items */}
+      <TouchableOpacity
+            style={[styles.menuItem, activeRoute === 'Reviews' && styles.menuItemActive]}
+            onPress={() => handleNavigation('Reviews')}>
+            <Text style={styles.menuText}>⭐ Reviews</Text>
+          </TouchableOpacity>
       <TouchableOpacity
         style={[styles.menuItem, activeRoute === 'Settings' && styles.menuItemActive]}
         onPress={() => handleNavigation('Settings')}>
