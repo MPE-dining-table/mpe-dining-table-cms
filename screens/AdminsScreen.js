@@ -16,13 +16,31 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Function to generate a random password
 const generatePassword = () => {
-  const length = 8;
-  const charset =
-    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()";
-  let password = "";
-  for (let i = 0; i < length; i++) {
-    password += charset.charAt(Math.floor(Math.random() * charset.length));
+  const length = 10;
+  
+  const upperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const lowerCase = "abcdefghijklmnopqrstuvwxyz";
+  const digits = "0123456789";
+  const specialChars = "!@#$%^&*()";
+  const allChars = upperCase + lowerCase + digits + specialChars;
+
+  // Ensure the password contains at least one character from each group
+  const getRandomChar = (chars) => chars.charAt(Math.floor(Math.random() * chars.length));
+  
+  let password = 
+    getRandomChar(upperCase) +
+    getRandomChar(lowerCase) +
+    getRandomChar(digits) +
+    getRandomChar(specialChars);
+
+  // Fill the remaining characters randomly from all character sets
+  for (let i = password.length; i < length; i++) {
+    password += getRandomChar(allChars);
   }
+
+  // Shuffle the characters to ensure randomness
+  password = password.split('').sort(() => Math.random() - 0.5).join('');
+  
   return password;
 };
 
@@ -123,6 +141,9 @@ const AdminsScreen = () => {
       <Text style={styles.adminCardText}>Full Name: {item.adminName}</Text>
       <Text style={styles.adminCardText}>Email: {item.email}</Text>
       <Text style={styles.adminCardText}>Role: {item.role}</Text>
+      <TouchableOpacity style={styles.onsideButton}>
+        <Text style={styles.onsideButtonText}>On Side</Text>
+      </TouchableOpacity>
     </View>
   );
 
@@ -266,6 +287,19 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontFamily: "Arial", // Use a modern font if available
   },
+  onsideButton: {
+    backgroundColor: "#28a745", // Green button
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    marginTop: 10,
+    alignItems: "center",
+  },
+  onsideButtonText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
   modalContainer: {
     flex: 1,
     justifyContent: "center",
@@ -310,28 +344,23 @@ const styles = StyleSheet.create({
   modalButtonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 20,
   },
   modalButton: {
     backgroundColor: "#007bff", // Blue button
-    padding: 15,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
     borderRadius: 10,
-    width: "48%",
+    flex: 1,
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 3,
-  },
-  cancelButton: {
-    backgroundColor: "#6c757d", // Gray button
+    marginHorizontal: 5,
   },
   modalButtonText: {
     color: "white",
-    fontWeight: "bold",
     fontSize: 16,
-    fontFamily: "Arial", // Use a modern font if available
+    fontWeight: "bold",
+  },
+  cancelButton: {
+    backgroundColor: "#dc3545", // Red button
   },
 });
 
