@@ -11,7 +11,7 @@ const SettingsScreen = ({ navigation }) => {
       // Reset the navigation stack and navigate to the Login screen
       navigation.reset({
         index: 0, // Reset to the first route
-        routes: [{ name: 'LoginScreen' }], // Ensure 'LoginScreen' is the correct route name
+        routes: [{ name: 'Login' }], // Ensure 'LoginScreen' is the correct route name
       });
     } catch (error) {
       console.error('Error during logout:', error);

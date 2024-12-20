@@ -1,50 +1,37 @@
-import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
-  FlatList, 
-  Image, 
-  Modal, 
-  TextInput, 
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  Image,
+  Modal,
+  TextInput,
   ScrollView,
   Platform,
   KeyboardAvoidingView,
   Keyboard,
   TouchableWithoutFeedback,
-} from 'react-native';
+  Alert,
+} from "react-native";
+import axios from "axios";
+import {
+  GestureHandlerRootView,
+  Swipeable,
+} from "react-native-gesture-handler";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const SuperAdminViewRestaurant = () => {
-  const [restaurants, setRestaurants] = useState([
-    {
-      id: '1',
-      name: 'Pasta Paradise',
-      address: '123 Main St, Foodville',
-      cuisine: 'Italian',
-      about: 'Authentic Italian cuisine with a modern twist',
-      image: 'https://example.com/pasta-restaurant.jpg',
-      timeSlot: '10:00 AM - 10:00 PM'
-    },
-    {
-      id: '2',
-      name: 'Sushi Sensation',
-      address: '456 Ocean Ave, Seafood City',
-      cuisine: 'Japanese',
-      about: 'Fresh sushi and traditional Japanese dishes',
-      image: 'https://example.com/sushi-restaurant.jpg',
-      timeSlot: '11:00 AM - 9:00 PM'
-    }
-  ]);
-
+  const [restaurants, setRestaurants] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [newRestaurant, setNewRestaurant] = useState({
-    name: '',
-    address: '',
-    cuisine: '',
-    about: '',
-    image: '',
-    timeSlot: '',
+    name: "",
+    address: "",
+    cuisine: "",
+    about: "",
+    image: "",
+    timeSlot: "",
   });
 
   const handleInputChange = (field, value) => {
@@ -55,43 +42,117 @@ const SuperAdminViewRestaurant = () => {
   };
 
   const handleAddRestaurant = () => {
-    const newRestaurantWithId = { ...newRestaurant, id: String(restaurants.length + 1) };
+    const newRestaurantWithId = {
+      ...newRestaurant,
+      id: String(restaurants.length + 1),
+    };
     setRestaurants([...restaurants, newRestaurantWithId]);
     setModalVisible(false);
     setNewRestaurant({
-      name: '',
-      address: '',
-      cuisine: '',
-      about: '',
-      image: '',
-      timeSlot: '',
+      name: "",
+      address: "",
+      cuisine: "",
+      about: "",
+      image: "",
+      timeSlot: "",
     });
   };
 
-  const RestaurantCard = ({ item }) => (
-    <View style={styles.card}>
-      <Image 
-        source={{ uri: item.image || 'https://via.placeholder.com/150' }} 
-        style={styles.cardImage} 
-      />
-      <View style={styles.cardContent}>
-        <Text style={styles.cardTitle}>{item.name}</Text>
-        <Text style={styles.cardSubtitle}>{item.cuisine}</Text>
-        <Text style={styles.cardAddress}>{item.address}</Text>
-        <Text style={styles.cardAbout} numberOfLines={2}>{item.about}</Text>
-        <Text style={styles.cardTimeSlot}>{item.timeSlot}</Text>
+  const fetchToken = async () => {
+    try {
+      const adminData = await AsyncStorage.getItem("admin");
+      if (adminData) {
+        const parsedData = JSON.parse(adminData);
+        return parsedData.token;
+      }
+    } catch (error) {
+      console.error("Error fetching token:", error);
+      return null;
+    }
+  };
+
+  const fetchRes = async () => {
+    try {
+      const response = await axios.get(
+        "https://mpe-backend-server.onrender.com/api/actions/fetch-restuarents"
+      );
+      setRestaurants(response.data.restuarents);
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Error", "Failed to fetch restaurants.");
+    }
+  };
+
+  useEffect(() => {
+    fetchRes();
+  }, [restaurants]);
+
+  const handleDeleteRestaurant = async (id) => {
+    const token = await fetchToken();
+    // console.log("item id", id);
+    try {
+      await axios.delete(
+        `https://mpe-backend-server.onrender.com/api/actions/delete-restuarent/${id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      setRestaurants((prevRestaurants) =>
+        prevRestaurants.filter((restaurant) => restaurant.id !== id)
+      );
+      Alert.alert("Success", "Restaurant deleted");
+
+      fetchRes();
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Error", "Failed to delete the restaurant.");
+    }
+  };
+
+  const RestaurantCard = ({ item, onDelete }) => {
+    const renderRightActions = () => (
+      <TouchableOpacity
+        style={styles.deleteButton}
+        onPress={() => onDelete(item.id)}
+      >
+        <Text style={styles.deleteButtonText}>Delete</Text>
+      </TouchableOpacity>
+    );
+
+    return (
+      <View>
+        <TouchableOpacity style={styles.card} onPress={()=> handleDeleteRestaurant(item._id)}>
+          <Image
+            source={{ uri: item.image || "https://via.placeholder.com/150" }}
+            style={styles.cardImage}
+          />
+          <View style={styles.cardContent}>
+            <Text style={styles.cardTitle}>{item.restaurantName}</Text>
+            <Text style={styles.cardSubtitle}>{item.cuisine}</Text>
+            <Text style={styles.cardAddress}>{item.address}</Text>
+            <Text style={styles.cardAbout} numberOfLines={2}>
+              {item.about}
+            </Text>
+            <Text style={styles.cardTimeSlot}>
+              Opened from: {item.openingTime}am - {item.closingTime}pm
+            </Text>
+          </View>
+        </TouchableOpacity>
       </View>
-    </View>
-  );
+    );
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Restaurants</Text>
 
-      <FlatList 
+      <FlatList
         data={restaurants}
-        renderItem={({ item }) => <RestaurantCard item={item} />}
-        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <RestaurantCard item={item} onDelete={handleDeleteRestaurant} />
+        )}
+        keyExtractor={(item, index) => index}
         contentContainerStyle={styles.flatListContent}
       />
 
@@ -103,67 +164,67 @@ const SuperAdminViewRestaurant = () => {
       </TouchableOpacity>
 
       {/* Modal for adding new restaurant */}
-      <Modal 
-        visible={modalVisible} 
-        animationType="slide" 
+      <Modal
+        visible={modalVisible}
+        animationType="slide"
         onRequestClose={() => setModalVisible(false)}
       >
         <KeyboardAvoidingView
           style={styles.modalContainer}
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <ScrollView contentContainerStyle={styles.modalContent}>
               <View style={styles.modalHeader}>
                 <Text style={styles.modalTitle}>Add New Restaurant</Text>
-                <TouchableOpacity onPress={() => setModalVisible(false)}>
-                
-                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => setModalVisible(false)}
+                ></TouchableOpacity>
               </View>
-              <TextInput 
-                style={styles.input} 
+              <TextInput
+                style={styles.input}
                 placeholder="Restaurant Name"
                 value={newRestaurant.name}
-                onChangeText={(text) => handleInputChange('name', text)}
+                onChangeText={(text) => handleInputChange("name", text)}
               />
-              <TextInput 
-                style={styles.input} 
+              <TextInput
+                style={styles.input}
                 placeholder="Address"
                 value={newRestaurant.address}
-                onChangeText={(text) => handleInputChange('address', text)}
+                onChangeText={(text) => handleInputChange("address", text)}
               />
-              <TextInput 
-                style={styles.input} 
+              <TextInput
+                style={styles.input}
                 placeholder="Cuisine"
                 value={newRestaurant.cuisine}
-                onChangeText={(text) => handleInputChange('cuisine', text)}
+                onChangeText={(text) => handleInputChange("cuisine", text)}
               />
-              <TextInput 
-                style={styles.input} 
+              <TextInput
+                style={styles.input}
                 placeholder="About"
                 value={newRestaurant.about}
-                onChangeText={(text) => handleInputChange('about', text)}
+                onChangeText={(text) => handleInputChange("about", text)}
               />
-              <TextInput 
-                style={styles.input} 
+              <TextInput
+                style={styles.input}
                 placeholder="Image URL"
                 value={newRestaurant.image}
-                onChangeText={(text) => handleInputChange('image', text)}
+                onChangeText={(text) => handleInputChange("image", text)}
               />
-              <TextInput 
-                style={styles.input} 
+              <TextInput
+                style={styles.input}
                 placeholder="Time Slot"
                 value={newRestaurant.timeSlot}
-                onChangeText={(text) => handleInputChange('timeSlot', text)}
+                onChangeText={(text) => handleInputChange("timeSlot", text)}
               />
-              <TouchableOpacity 
-                style={styles.submitButton} 
+              <TouchableOpacity
+                style={styles.submitButton}
                 onPress={handleAddRestaurant}
               >
                 <Text style={styles.submitButtonText}>Add Restaurant</Text>
               </TouchableOpacity>
-              <TouchableOpacity 
-                style={styles.cancelButton} 
+              <TouchableOpacity
+                style={styles.cancelButton}
                 onPress={() => setModalVisible(false)}
               >
                 <Text style={styles.cancelButtonText}>Cancel</Text>
@@ -183,7 +244,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f9f9f9", // Light gray background
     padding: 15,
-    width:"100%"
+    width: "100%",
   },
   title: {
     fontSize: 28,
@@ -210,9 +271,21 @@ const styles = StyleSheet.create({
   },
   cardImage: {
     width: 120,
-    height: 120,
+    height: "auto",
     borderTopLeftRadius: 15,
     borderBottomLeftRadius: 15,
+  },
+  deleteButton: {
+    backgroundColor: "red",
+    justifyContent: "center",
+    alignItems: "center",
+    width: 75,
+    height: "90%",
+  },
+  deleteButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
   },
   cardContent: {
     flex: 1,
@@ -271,7 +344,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.5)", // Semi-transparent background
   },
   modalContent: {
-    top:'10%',
+    top: "10%",
     width: "100%",
     maxHeight: "90%",
     backgroundColor: "#ffffff", // White background
@@ -294,9 +367,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#333",
   },
-  closeButton: {
-    
-  },
+  closeButton: {},
   input: {
     borderWidth: 1,
     borderColor: "#ddd",

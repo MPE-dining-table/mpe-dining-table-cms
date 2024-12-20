@@ -17,7 +17,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 // Function to generate a random password
 const generatePassword = () => {
   const length = 10;
-  
+
   const upperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   const lowerCase = "abcdefghijklmnopqrstuvwxyz";
   const digits = "0123456789";
@@ -25,9 +25,10 @@ const generatePassword = () => {
   const allChars = upperCase + lowerCase + digits + specialChars;
 
   // Ensure the password contains at least one character from each group
-  const getRandomChar = (chars) => chars.charAt(Math.floor(Math.random() * chars.length));
-  
-  let password = 
+  const getRandomChar = (chars) =>
+    chars.charAt(Math.floor(Math.random() * chars.length));
+
+  let password =
     getRandomChar(upperCase) +
     getRandomChar(lowerCase) +
     getRandomChar(digits) +
@@ -39,8 +40,11 @@ const generatePassword = () => {
   }
 
   // Shuffle the characters to ensure randomness
-  password = password.split('').sort(() => Math.random() - 0.5).join('');
-  
+  password = password
+    .split("")
+    .sort(() => Math.random() - 0.5)
+    .join("");
+
   return password;
 };
 
@@ -82,13 +86,16 @@ const AdminsScreen = () => {
         "https://mpe-backend-server.onrender.com/api/actions/get-admins",
         {
           headers: { Authorization: `Bearer ${token}` },
-          params: { page: 1, limit: 10 }, // Fetch first 10 admins
+          params: { page: 1, limit: 10 },
         }
       );
 
       setAdmins(response.data.admins);
     } catch (error) {
-      console.error("Error fetching admins:", error.response?.data || error.message);
+      console.error(
+        "Error fetching admins:",
+        error.response?.data || error.message
+      );
       Alert.alert("Error", "Failed to fetch admin list.");
     }
   };
@@ -119,7 +126,10 @@ const AdminsScreen = () => {
         }
       );
 
-      Alert.alert("Success", response.data.message || "Admin added successfully!");
+      Alert.alert(
+        "Success",
+        response.data.message || "Admin added successfully!"
+      );
       fetchAdmins(); // Refresh the admin list
       setIsAddModalVisible(false);
       setNewAdmin({
@@ -130,19 +140,46 @@ const AdminsScreen = () => {
         password: generatePassword(),
       });
     } catch (error) {
-      console.error("Error adding admin:", error.response?.data || error.message);
+      console.error(
+        "Error adding admin:",
+        error.response?.data || error.message
+      );
       Alert.alert("Error", "Failed to add the new admin.");
+    }
+  };
+
+  const handleDeleteAdmin = async (id) => {
+    const token = await fetchToken();
+    // console.log("item id", id);
+    try {
+      await axios.delete(
+        `https://mpe-backend-server.onrender.com/api/actions/remove-admin/${id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      Alert.alert("Success", "Admin deleted");
+
+      fetchAdmins();
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Error", "Failed to delete the admin.");
     }
   };
 
   const AdminCard = ({ item }) => (
     <View style={styles.adminCard}>
-      <Text style={styles.adminCardText}>Restaurant: {item.restuarentName}</Text>
+      <Text style={styles.adminCardText}>
+        Restaurant: {item.restuarentName}
+      </Text>
       <Text style={styles.adminCardText}>Full Name: {item.adminName}</Text>
       <Text style={styles.adminCardText}>Email: {item.email}</Text>
       <Text style={styles.adminCardText}>Role: {item.role}</Text>
-      <TouchableOpacity style={styles.onsideButton}>
-        <Text style={styles.onsideButtonText}>On Side</Text>
+      <TouchableOpacity
+        style={styles.onsideButton}
+        onPress={() => handleDeleteAdmin(item._id)}
+      >
+        <Text style={styles.onsideButtonText}>Delete</Text>
       </TouchableOpacity>
     </View>
   );
@@ -188,13 +225,17 @@ const AdminsScreen = () => {
                 style={styles.input}
                 placeholder="Full Name"
                 value={newAdmin.fullName}
-                onChangeText={(text) => setNewAdmin({ ...newAdmin, fullName: text })}
+                onChangeText={(text) =>
+                  setNewAdmin({ ...newAdmin, fullName: text })
+                }
               />
               <TextInput
                 style={styles.input}
                 placeholder="Email Address"
                 value={newAdmin.email}
-                onChangeText={(text) => setNewAdmin({ ...newAdmin, email: text })}
+                onChangeText={(text) =>
+                  setNewAdmin({ ...newAdmin, email: text })
+                }
               />
               <TextInput
                 style={styles.input}
