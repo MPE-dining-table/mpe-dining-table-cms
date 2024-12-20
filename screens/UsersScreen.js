@@ -1,95 +1,131 @@
-import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
-  FlatList, 
-  Modal, 
-  TextInput, 
-  ScrollView
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Modal,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+} from "react-native";
 
 const UsersScreen = () => {
-  // State to manage users and modal visibility
-  const [users, setUsers] = useState([
-    {
-      id: '1',
-      fullName: 'John Doe',
-      email: 'john.doe@example.com',
-      phoneNumber: '+1234567890'
-    },
-    {
-      id: '2',
-      fullName: 'Jane Smith',
-      email: 'jane.smith@example.com',
-      phoneNumber: '+0987654321'
-    }
-  ]);
+  const [users, setUsers] = useState([]);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [newUser, setNewUser] = useState({
-    id: '',
-    fullName: '',
-    email: '',
-    phoneNumber: ''
+    id: "",
+    fullName: "",
+    email: "",
+    phoneNumber: "",
+    role: "user", // Assuming role is set to 'user' by default
   });
 
-  // Function to add a new user
+  const fetchToken = async () => {
+    try {
+      const adminData = await AsyncStorage.getItem("admin");
+      if (adminData) {
+        const parsedData = JSON.parse(adminData);
+        return parsedData.token;
+      }
+    } catch (error) {
+      console.error("Error fetching token:", error);
+      return null;
+    }
+  };
+
+  const fetchUsers = async () => {
+    const token = await fetchToken();
+    try {
+      const response = await axios.get(
+        "https://mpe-backend-server.onrender.com/api/actions/get-users",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setUsers(response.data.users);
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Error", "Failed to fetch restaurants.");
+    }
+  };
+
+  const handleDeleteUser = async (id) => {
+    const token = await fetchToken();
+    try {
+      await axios.delete(
+        `https://mpe-backend-server.onrender.com/api/actions/delete-user/${id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      Alert.alert("Success", "User deleted");
+      fetchUsers();
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Error", "Failed to delete the user.");
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
   const addUser = () => {
     if (!newUser.fullName || !newUser.email || !newUser.phoneNumber) {
-      alert('Please fill in all fields');
+      alert("Please fill in all fields");
       return;
     }
 
     const userToAdd = {
       ...newUser,
-      id: (users.length + 1).toString()
+      id: (users.length + 1).toString(), // Generate ID dynamically
     };
 
     setUsers([...users, userToAdd]);
     setIsAddModalVisible(false);
-    // Reset the new user form
     setNewUser({
-      id: '',
-      fullName: '',
-      email: '',
-      phoneNumber: ''
+      id: "",
+      fullName: "",
+      email: "",
+      phoneNumber: "",
+      role: "user", // Reset role to user after adding
     });
   };
 
-  // Render individual user card
-  const UserCard = ({ item }) => (
-    <View style={styles.userCard}>
-      <Text style={styles.userCardText}>ID: {item.id}</Text>
-      <Text style={styles.userCardText}>Full Name: {item.fullName}</Text>
-      <Text style={styles.userCardText}>Email: {item.email}</Text>
-      <Text style={styles.userCardText}>Phone Number: {item.phoneNumber}</Text>
+  const UserCard = ({ item, handleDeleteUser }) => (
+    <View>
+      <TouchableOpacity
+        style={styles.userCard}
+        onPress={() => handleDeleteUser(item._id)}
+      >
+        <Text style={styles.userCardText}>Full Name: {item.firstName}</Text>
+        <Text style={styles.userCardText}>Last Name: {item.lastName}</Text>
+        <Text style={styles.userCardText}>Email: {item.email}</Text>
+        <Text style={styles.userCardText}>Phone Number: {item.cellphone}</Text>
+        <Text style={styles.userCardText}>Role: {item.role}</Text>
+      </TouchableOpacity>
     </View>
   );
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.title}>Users</Text>
-        <TouchableOpacity 
-          style={styles.addButton} 
-          onPress={() => setIsAddModalVisible(true)}
-        >
-          <Ionicons name="add" size={24} color="white" />
-        </TouchableOpacity>
-      </View>
-
-      {/* User List */}
       <FlatList
         data={users}
-        renderItem={UserCard}
-        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <UserCard item={item} handleDeleteUser={handleDeleteUser} />
+        )}
+        keyExtractor={(item) => item._id}
         contentContainerStyle={styles.userList}
+        ListEmptyComponent={
+          <Text style={styles.emptyText}>No users available.</Text>
+        }
       />
 
-      {/* Add User Modal */}
       <Modal
         visible={isAddModalVisible}
         animationType="slide"
@@ -99,7 +135,7 @@ const UsersScreen = () => {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Add New User</Text>
-            <ScrollView 
+            <ScrollView
               contentContainerStyle={styles.scrollViewContent}
               keyboardShouldPersistTaps="handled"
             >
@@ -108,33 +144,40 @@ const UsersScreen = () => {
                 placeholder="Full Name"
                 placeholderTextColor="#888"
                 value={newUser.fullName}
-                onChangeText={(text) => setNewUser({...newUser, fullName: text})}
+                onChangeText={(text) =>
+                  setNewUser({ ...newUser, fullName: text })
+                }
               />
               <TextInput
                 style={styles.input}
                 placeholder="Email Address"
                 placeholderTextColor="#888"
                 value={newUser.email}
-                onChangeText={(text) => setNewUser({...newUser, email: text})}
+                onChangeText={(text) => setNewUser({ ...newUser, email: text })}
               />
               <TextInput
                 style={styles.input}
                 placeholder="Phone Number"
                 placeholderTextColor="#888"
                 value={newUser.phoneNumber}
-                onChangeText={(text) => setNewUser({...newUser, phoneNumber: text})}
+                onChangeText={(text) =>
+                  setNewUser({ ...newUser, phoneNumber: text })
+                }
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Role (user or admin)"
+                placeholderTextColor="#888"
+                value={newUser.role}
+                onChangeText={(text) => setNewUser({ ...newUser, role: text })}
               />
 
-              {/* Modal Buttons */}
               <View style={styles.modalButtonContainer}>
-                <TouchableOpacity 
-                  style={styles.modalButton} 
-                  onPress={addUser}
-                >
+                <TouchableOpacity style={styles.modalButton} onPress={addUser}>
                   <Text style={styles.modalButtonText}>Add User</Text>
                 </TouchableOpacity>
-                <TouchableOpacity 
-                  style={[styles.modalButton, styles.cancelButton]} 
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.cancelButton]}
                   onPress={() => setIsAddModalVisible(false)}
                 >
                   <Text style={styles.modalButtonText}>Cancel</Text>
@@ -151,132 +194,85 @@ const UsersScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f0f0', // Light gray background
+    backgroundColor: "#f0f0f0",
     padding: 15,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    backgroundColor: '#ffffff', // White background
-    borderRadius: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333', // Dark gray text
-    fontFamily: 'Arial', // Use a modern font if available
-  },
-  addButton: {
-    backgroundColor: '#007bff', // Blue button
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 3,
   },
   userList: {
     paddingHorizontal: 10,
     paddingTop: 10,
   },
   userCard: {
-    backgroundColor: '#ffffff', // White background
+    backgroundColor: "#ffffff",
     borderRadius: 15,
     padding: 20,
     marginBottom: 20,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
     borderWidth: 1,
-    borderColor: '#e0e0e0', // Light gray border
+    borderColor: "#e0e0e0",
   },
   userCardText: {
     fontSize: 18,
-    color: '#555', // Slightly lighter text
+    color: "#555",
     marginBottom: 10,
-    fontFamily: 'Arial', // Use a modern font if available
   },
   modalContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)', // Semi-transparent background
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
   modalContent: {
-    width: '90%',
-    maxHeight: '90%',
-    backgroundColor: '#ffffff', // White background
+    width: "90%",
+    maxHeight: "90%",
+    backgroundColor: "#ffffff",
     borderRadius: 20,
     padding: 25,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
   },
-  scrollViewContent: {
-    flexGrow: 1,
-    justifyContent: 'center',
-  },
   modalTitle: {
     fontSize: 26,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
-    textAlign: 'center',
-    color: '#333', // Dark gray text
-    fontFamily: 'Arial', // Use a modern font if available
+    textAlign: "center",
+    color: "#333",
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     padding: 15,
     marginBottom: 20,
     borderRadius: 10,
-    backgroundColor: '#f9f9f9', // Light gray background
-    color: '#333', // Dark gray text
+    backgroundColor: "#f9f9f9",
+    color: "#333",
     fontSize: 16,
-    fontFamily: 'Arial', // Use a modern font if available
   },
   modalButtonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginTop: 20,
   },
   modalButton: {
-    backgroundColor: '#007bff', // Blue button
+    backgroundColor: "#007bff",
     padding: 15,
     borderRadius: 10,
-    width: '48%',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 3,
+    width: "48%",
+    alignItems: "center",
   },
   cancelButton: {
-    backgroundColor: '#6c757d', // Gray button
+    backgroundColor: "#6c757d",
   },
   modalButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: "white",
+    fontWeight: "bold",
     fontSize: 16,
-    fontFamily: 'Arial', // Use a modern font if available
   },
 });
 

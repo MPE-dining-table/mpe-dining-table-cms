@@ -16,13 +16,35 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Function to generate a random password
 const generatePassword = () => {
-  const length = 8;
-  const charset =
-    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()";
-  let password = "";
-  for (let i = 0; i < length; i++) {
-    password += charset.charAt(Math.floor(Math.random() * charset.length));
+  const length = 10;
+
+  const upperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const lowerCase = "abcdefghijklmnopqrstuvwxyz";
+  const digits = "0123456789";
+  const specialChars = "!@#$%^&*()";
+  const allChars = upperCase + lowerCase + digits + specialChars;
+
+  // Ensure the password contains at least one character from each group
+  const getRandomChar = (chars) =>
+    chars.charAt(Math.floor(Math.random() * chars.length));
+
+  let password =
+    getRandomChar(upperCase) +
+    getRandomChar(lowerCase) +
+    getRandomChar(digits) +
+    getRandomChar(specialChars);
+
+  // Fill the remaining characters randomly from all character sets
+  for (let i = password.length; i < length; i++) {
+    password += getRandomChar(allChars);
   }
+
+  // Shuffle the characters to ensure randomness
+  password = password
+    .split("")
+    .sort(() => Math.random() - 0.5)
+    .join("");
+
   return password;
 };
 
@@ -64,13 +86,16 @@ const AdminsScreen = () => {
         "https://mpe-backend-server.onrender.com/api/actions/get-admins",
         {
           headers: { Authorization: `Bearer ${token}` },
-          params: { page: 1, limit: 10 }, // Fetch first 10 admins
+          params: { page: 1, limit: 10 },
         }
       );
 
       setAdmins(response.data.admins);
     } catch (error) {
-      console.error("Error fetching admins:", error.response?.data || error.message);
+      console.error(
+        "Error fetching admins:",
+        error.response?.data || error.message
+      );
       Alert.alert("Error", "Failed to fetch admin list.");
     }
   };
@@ -101,7 +126,10 @@ const AdminsScreen = () => {
         }
       );
 
-      Alert.alert("Success", response.data.message || "Admin added successfully!");
+      Alert.alert(
+        "Success",
+        response.data.message || "Admin added successfully!"
+      );
       fetchAdmins(); // Refresh the admin list
       setIsAddModalVisible(false);
       setNewAdmin({
@@ -112,17 +140,47 @@ const AdminsScreen = () => {
         password: generatePassword(),
       });
     } catch (error) {
-      console.error("Error adding admin:", error.response?.data || error.message);
+      console.error(
+        "Error adding admin:",
+        error.response?.data || error.message
+      );
       Alert.alert("Error", "Failed to add the new admin.");
+    }
+  };
+
+  const handleDeleteAdmin = async (id) => {
+    const token = await fetchToken();
+    // console.log("item id", id);
+    try {
+      await axios.delete(
+        `https://mpe-backend-server.onrender.com/api/actions/remove-admin/${id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      Alert.alert("Success", "Admin deleted");
+
+      fetchAdmins();
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Error", "Failed to delete the admin.");
     }
   };
 
   const AdminCard = ({ item }) => (
     <View style={styles.adminCard}>
-      <Text style={styles.adminCardText}>Restaurant: {item.restuarentName}</Text>
+      <Text style={styles.adminCardText}>
+        Restaurant: {item.restuarentName}
+      </Text>
       <Text style={styles.adminCardText}>Full Name: {item.adminName}</Text>
       <Text style={styles.adminCardText}>Email: {item.email}</Text>
       <Text style={styles.adminCardText}>Role: {item.role}</Text>
+      <TouchableOpacity
+        style={styles.onsideButton}
+        onPress={() => handleDeleteAdmin(item._id)}
+      >
+        <Text style={styles.onsideButtonText}>Delete</Text>
+      </TouchableOpacity>
     </View>
   );
 
@@ -167,13 +225,17 @@ const AdminsScreen = () => {
                 style={styles.input}
                 placeholder="Full Name"
                 value={newAdmin.fullName}
-                onChangeText={(text) => setNewAdmin({ ...newAdmin, fullName: text })}
+                onChangeText={(text) =>
+                  setNewAdmin({ ...newAdmin, fullName: text })
+                }
               />
               <TextInput
                 style={styles.input}
                 placeholder="Email Address"
                 value={newAdmin.email}
-                onChangeText={(text) => setNewAdmin({ ...newAdmin, email: text })}
+                onChangeText={(text) =>
+                  setNewAdmin({ ...newAdmin, email: text })
+                }
               />
               <TextInput
                 style={styles.input}
@@ -266,6 +328,19 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontFamily: "Arial", // Use a modern font if available
   },
+  onsideButton: {
+    backgroundColor: "#28a745", // Green button
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    marginTop: 10,
+    alignItems: "center",
+  },
+  onsideButtonText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
   modalContainer: {
     flex: 1,
     justifyContent: "center",
@@ -303,35 +378,30 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     borderRadius: 10,
     backgroundColor: "#f9f9f9", // Light gray background
-    color: "#333", // Dark gray text
+    color: "black", // Dark gray text
     fontSize: 16,
     fontFamily: "Arial", // Use a modern font if available
   },
   modalButtonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 20,
   },
   modalButton: {
     backgroundColor: "#007bff", // Blue button
-    padding: 15,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
     borderRadius: 10,
-    width: "48%",
+    flex: 1,
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 3,
-  },
-  cancelButton: {
-    backgroundColor: "#6c757d", // Gray button
+    marginHorizontal: 5,
   },
   modalButtonText: {
     color: "white",
-    fontWeight: "bold",
     fontSize: 16,
-    fontFamily: "Arial", // Use a modern font if available
+    fontWeight: "bold",
+  },
+  cancelButton: {
+    backgroundColor: "#dc3545", // Red button
   },
 });
 

@@ -5,13 +5,13 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+
 const LoginScreen = () => {
   const navigation = useNavigation();
   const [userInfo, setUserInfo] = useState({
@@ -19,6 +19,7 @@ const LoginScreen = () => {
     password: "",
   });
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false); // Loader state
 
   const handleChange = (key, value) => {
     setUserInfo({ ...userInfo, [key]: value });
@@ -41,17 +42,14 @@ const LoginScreen = () => {
 
   const handleSubmit = async () => {
     if (validate()) {
+      setLoading(true); // Show loader
       try {
         const response = await axios.post(
           "https://mpe-backend-server.onrender.com/api/auth/admin-login",
           userInfo
         );
 
-        // const { user, token } = response.data;
-
-        // dispatch(setUser({ user, token }));
-
-        AsyncStorage.setItem("admin", JSON.stringify(response.data));
+        await AsyncStorage.setItem("admin", JSON.stringify(response.data));
 
         Alert.alert("Success", "Admin login successfully!");
         setUserInfo({
@@ -59,7 +57,7 @@ const LoginScreen = () => {
           password: "",
         });
         setErrors({});
-        navigation.navigate("Dashboard"); // Navigate to Dashboard on successful login
+        navigation.navigate("Dashboard");
       } catch (error) {
         console.error("API Error:", error.response?.data || error.message);
         Alert.alert(
@@ -67,21 +65,13 @@ const LoginScreen = () => {
           error.response?.data?.message ||
             "Something went wrong. Please try again."
         );
+      } finally {
+        setLoading(false); // Hide loader
       }
     }
   };
 
-  // const handleLogin = () => {
-  //   // Logic for authentication (e.g., Firebase Auth or other)
-  //   console.log("Logging in with:", email, password);
-  //   navigation.navigate('Dashboard'); // Navigate to Dashboard on successful login
-  // };
-
   return (
-    // <KeyboardAvoidingView
-    //   behavior={Platform.OS === "ios" ? "padding" : "height"}
-    //   style={styles.container}
-    // >
     <Fragment>
       <View style={styles.background}>
         <View style={styles.leftBackground} />
@@ -93,7 +83,6 @@ const LoginScreen = () => {
         <TextInput
           style={styles.input}
           placeholder="Email"
-          // value={email}
           onChangeText={(text) => handleChange("email", text)}
           keyboardType="email-address"
           autoCapitalize="none"
@@ -103,7 +92,6 @@ const LoginScreen = () => {
         <TextInput
           style={styles.input}
           placeholder="Password"
-          // value={password}
           onChangeText={(text) => handleChange("password", text)}
           secureTextEntry
           autoCapitalize="none"
@@ -111,22 +99,24 @@ const LoginScreen = () => {
         {errors.password && (
           <Text style={styles.errorText}>{errors.password}</Text>
         )}
-        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-          <Text style={styles.buttonText}>Login</Text>
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleSubmit}
+          disabled={loading} // Disable button while loading
+        >
+          {loading ? (
+            <ActivityIndicator size="small" color="#fff" /> // Loader inside the button
+          ) : (
+            <Text style={styles.buttonText}>Login</Text>
+          )}
         </TouchableOpacity>
-        {/* <Text style={styles.signupText}>
-          Don't have an account? <Text style={styles.signupLink}>Sign Up</Text>
-        </Text> */}
       </View>
     </Fragment>
-    // {/* </KeyboardAvoidingView> */}
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   background: {
     position: "absolute",
     top: 0,
@@ -137,29 +127,28 @@ const styles = StyleSheet.create({
   },
   leftBackground: {
     flex: 1,
-    backgroundColor: "#6A5ACD", // Left side color (e.g., Slate Blue)
+    backgroundColor: "#6A5ACD",
   },
   rightBackground: {
     flex: 1,
-    backgroundColor: "#FF6347", // Right side color (e.g., Tomato)
+    backgroundColor: "#FF6347",
   },
   content: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
-    backgroundColor: "transparent", // Ensures the content is transparent
   },
   header: {
     fontSize: 28,
     fontWeight: "bold",
     marginBottom: 10,
     textAlign: "center",
-    color: "#fff", // White text for contrast
+    color: "#fff",
   },
   subHeader: {
     fontSize: 16,
-    color: "#f5f5f5", // Light gray text for contrast
+    color: "#f5f5f5",
     marginBottom: 20,
     textAlign: "center",
   },
@@ -171,7 +160,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 15,
     paddingLeft: 15,
-    backgroundColor: "#fff", // White background for inputs
+    backgroundColor: "#fff",
     fontSize: 16,
   },
   button: {
@@ -181,19 +170,11 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     alignItems: "center",
     marginBottom: 15,
+    opacity: 1,
   },
   buttonText: {
     color: "#fff",
     fontSize: 18,
-    fontWeight: "bold",
-  },
-  signupText: {
-    textAlign: "center",
-    color: "#f5f5f5", // Light gray text for contrast
-    fontSize: 16,
-  },
-  signupLink: {
-    color: "#fff", // White text for contrast
     fontWeight: "bold",
   },
   errorText: {
